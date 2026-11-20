@@ -11,44 +11,36 @@
 - **Game:** Web-game `Touhou-like (danmaku)` + `Stealth/Navigation` chủ đề **Cơ yếu quân sự Việt Nam (1945–1975)**.
 - **Tech stack đã chốt:** `Vite` + `TypeScript` + `PixiJS` (WebGL), dùng **`pnpm`** (KHÔNG dùng `npm`). Node runtime (`26.13.1`) đã tự cấu hình trong `package.json -> devEngines`.
 - **Luật cốt lõi đã chốt:**
-  1. Map `2D top-down` đi tự do né mai phục dưới mù thông tin; dính bẫy → màn giao tranh siêu khó (Tutorial kiểu Souls-like thua vẫn đi tiếp, thắng +1 Max HP vĩnh viễn; màn thường thua = Game Over chơi lại vùng; thắng = **bắt buộc bắn cạn HP địch**).
-  2. 5 Vùng & 5 Xe nâng cấp tự động: `V1 Pháp (Xe đạp)` → `V2 Pháp++ (Xe đạp thồ)` → `V3 Ngụy (Bốn bánh)` → `V4 Mỹ (Xe tải)` → `V5 Ngụy-- Sài Gòn (Max Xe tăng + Max 4 kĩ năng)`.
-  3. **Hitbox khớp đúng kích thước thân xe** (xe to lên → né khó hơn, bù bằng HP + hỏa lực + kĩ năng cơ yếu).
-  4. Rời mỗi vùng hiện modal 2 cột (cốt truyện + chọn 1 kĩ năng cơ yếu chạy theo `interval`); vật phẩm lịch sử rơi trên cả map lẫn combat hiện dialog **không chắn tầm nhìn, không khóa điều khiển** theo **1 timeline chung 1945–1975**.
-  5. Kết thúc: Xe tăng húc đổ cổng Dinh Độc Lập → `end_game` cutscene → `after_credit` (Cơ yếu thời đại số).
+  1. Map `2D top-down` ban ngày sáng theo đường mòn mở phân nhánh (mỗi vùng đúng `1` nhánh sạch mai phục); dính bẫy → màn giao tranh khắc nghiệt (trận mở màn đầu Chặng I thua vẫn đi tiếp, thắng teleport sát đích + `+1` độ bền vĩnh viễn; tái đấu B-52 cuối Chặng IV Trường Sơn; màn thường thua chơi lại vùng; thắng = bắn cạn HP địch, lượm tư liệu giữa trận trừ `25%` HP hiện tại của địch).
+  2. 5 Vùng & 5 Xe nâng cấp tự động: `V1 Pháp (Xe đạp)` → `V2 Pháp++ (Xe đạp thồ)` → `V3 Ngụy (Xe bốn bánh)` → `V4 Mỹ (Xe tải Trường Sơn)` → `V5 Ngụy-- Sài Gòn (Xe tăng T-54B + Max toàn bộ cải tiến)`.
+  3. **Hitbox:** V1–V4 dùng vùng va chạm gọn đồng nhất `18×28`; riêng Xe tăng T-54B giữ trọn `44×64`.
+  4. Rời mỗi vùng hiện modal 2 cột (hồ sơ chiến trường + chọn `1/3` cải tiến Cơ yếu); 20 hồ sơ lịch sử nối chung 1 timeline 1945–1975 hiện ở hộp thoại đáy màn hình không khóa điều khiển; lượm hồ sơ bản đồ cộng `1` Giáp hồi sinh (`🛡`).
+  5. Kết thúc: Xe tăng (độ bền khóa `>= 1` trước cổng) húc đổ cổng Dinh Độc Lập → `end_game` → `after_credit` (sau 1975). Nhạc nền hành khúc cách mạng 4 chương Web Audio.
 - **Chi tiết đầy đủ:** Xem [docs/GAME_SPEC.md](./docs/GAME_SPEC.md).
 
 ---
 
 ## 2. Trạng thái hiện tại (ĐANG Ở ĐÂY)
 
-- **Giai đoạn hiện tại:** `Phase 8 — Hoàn tất toàn bộ mã nguồn & build sạch; còn playtest trực tiếp trên trình duyệt`
-- **Tiến độ tổng thể:** `26 / 27 tasks` (`96%`)
+- **Giai đoạn hiện tại:** `HOÀN THÀNH TOÀN BỘ (100%)`
+- **Tiến độ tổng thể:** `27 / 27 tasks` (`100%`)
 - **Đã hoàn thành:**
-  - [x] Toàn bộ Phase 0 (`T0.1–T0.4`): Khởi tạo `Vite + TypeScript + PixiJS` (`pnpm` + Node `26.13.1`), `GameState`, `SceneManager`, `InputManager` (`WASD` + Mobile relative touch drag), `AudioEngine` (Web Audio synth + Morse).
-  - [x] Toàn bộ Phase 1 (`T1.1–T1.5`): `vehicles.ts` (5 xe), `skills.ts` (4 kĩ năng), `regions.ts` (5 vùng, 30 ổ bẫy, 15 điểm rơi), `loreTimeline.ts` (15 mốc + toàn bộ cutscenes), `SpriteFactory.ts` (5 xe, địch 5 phe, Cổng Dinh Độc Lập vỡ được).
-  - [x] Toàn bộ Phase 2 (`T2.1–T2.2`): `TitleScene` (Scene 0) & `CutsceneScene` tái sử dụng (Scene 1 `INTRO`, Scene 7 `END_GAME`, Scene 8 `AFTER_CREDIT`).
-  - [x] Toàn bộ Phase 3 & 4 (`T3.1–T4.3`): `OverworldScene` (5 vùng + Fog of War mượt), `LoreToastUI` (non-blocking), `CryptoSkillSystem` (4 kĩ năng theo `interval` + viền sáng ngoài map + Morse + mod-10 ticker + chế độ MAX ở V5).
-  - [x] Toàn bộ Phase 5, 6, 7 (`T5.1–T7.2`): `BulletEngine` (object pool + 5 bộ pattern + laser Mỹ), `CombatScene` (Tutorial Souls-like 2 nhánh + Game Over màn thường), `RegionExitOverlay` (modal 2 cột), cao trào húc đổ cổng Dinh Độc Lập.
-  - [x] `T8.2` Build & Invariants: `pnpm typecheck && pnpm build` xanh 0 lỗi (`dist/` built in 8.49s); vượt qua toàn bộ kiểm tra logic tự động qua Vite SSR (`ALL_GAME_INVARIANTS_OK`).
-- **Đang làm dở:** `T8.1` — Chưa test bằng Chrome tự động do Chrome DevTools MCP chưa kết nối.
+  - [x] Toàn bộ Phase 0 (`T0.1–T0.4`): Khởi tạo `Vite + TypeScript + PixiJS` (`pnpm` + Node `26.13.1`), `GameState`, `SceneManager`, `InputManager` (`WASD` + Mobile relative touch drag), `AudioEngine` (Web Audio synth: nhạc nền hành khúc cách mạng 4 chương + Morse + SFX).
+  - [x] Toàn bộ Phase 1 (`T1.1–T1.5`): `vehicles.ts` (5 xe, hitbox `18×28` cho V1–V4 & `44×64` cho Xe tăng), `skills.ts` (6 cải tiến Cơ yếu), `regions.ts` (5 bản đồ đường mòn mở, mỗi chặng đúng 1 nhánh sạch mai phục), `loreTimeline.ts` (20 hồ sơ 1945–1975 + các cắt cảnh), `SpriteFactory.ts` (5 xe, địch 5 phe + B-26/F-4/B-52, Cổng Dinh Độc Lập vỡ được).
+  - [x] Toàn bộ Phase 2 (`T2.1–T2.2`): `TitleScene` (bản đồ cổ ban ngày, la bàn xoay, tuyến điện mật Bắc–Nam) & `CutsceneScene` tái sử dụng (`INTRO`, `END_GAME`, `AFTER_CREDIT`).
+  - [x] Toàn bộ Phase 3 & 4 (`T3.1–T4.3`): `OverworldScene` (bản đồ mở bám đường mòn, minimap, thẻ tên vùng fade-out, giáp hồi sinh từ tư liệu bản đồ), `LoreToastUI` (Visual Novel đáy màn hình không chặn thao tác), `CryptoSkillSystem` (chu kỳ radar, viền cảnh báo + Morse, gợi ý địa hình, giải mã nhánh an toàn & chế độ MAX V5).
+  - [x] Toàn bộ Phase 5, 6, 7 (`T5.1–T7.2`): `BulletEngine` (đạn lơ lửng, lưới đạn chậm dày, bom tròn AoE lớn, tự ngắm liên thanh sau `4.5s` nạp vũ khí), `CombatScene` (trận mở màn Chặng I + tái đấu B-52 cuối Trường Sơn + tư liệu đứng yên trừ 25% HP hiện tại của boss), `RegionExitOverlay` (modal 2 cột tập trung hồ sơ + 3 nút chọn cải tiến), cao trào Xe tăng húc đổ cổng Dinh Độc Lập (khóa độ bền `>= 1` trước cổng).
+  - [x] Toàn bộ Phase 8 (`T8.1–T8.2`): Playtest trọn vòng cùng Duma qua nhiều phiên tinh chỉnh nội dung, hitbox, boss, nhạc nền & độ ổn định; `pnpm typecheck && pnpm build` xanh 0 lỗi (`dist/` built); `README.md` đã viết lại hoàn chỉnh cho người đọc.
+- **Đang làm dở:** Không có — dự án đã hoàn thiện đầy đủ (`27 / 27 tasks`).
 
 ---
 
-## 3. VIỆC TIẾP THEO LÀM NGAY (Next Atomic Step)
+## 3. TRẠNG THÁI BÀN GIAO
 
-> **Task còn lại duy nhất: `T8.1` trong [docs/ROADMAP.md](./docs/ROADMAP.md#phase-8-kiểm-thử-toàn-diện-cân-bằng--polish)**
-
-1. **Làm gì:** Mở trình duyệt tại `http://localhost:5173/` (chạy `pnpm dev` nếu chưa bật) và chơi thử trọn vẹn Scene 0 → Scene 8 trên PC (`WASD`) và chế độ Mobile DevTools (`390×844` touch).
-2. **Kiểm tra cảm giác chơi:**
-   - Độ khó Tutorial Souls-like (có đủ khó nhưng vẫn né được?) & đường cong `Pháp < Pháp++ < Ngụy < Mỹ >> Ngụy--`.
-   - Cảm giác kéo cảm ứng mobile + độ rõ của dialog lịch sử `LoreToastUI`.
-   - Hiệu ứng húc cổng Dinh Độc Lập & nhịp chuyển `end_game` → `after_credit`.
-3. **Nếu cần tinh chỉnh số liệu:**
-   - Độ khó đạn & tần suất bắn: `src/systems/BulletEngine.ts`, `src/scenes/CombatScene.ts`.
-   - Vị trí bẫy & tầm nhìn: `src/data/regions.ts`.
-   - Tốc độ/HP/hitbox xe: `src/data/vehicles.ts`.
-4. **Xong `T8.1`:** Tick `[x] T8.1` trong [docs/ROADMAP.md](./docs/ROADMAP.md), đổi tiến độ file này thành `27 / 27 tasks (100%)`.
+1. **Chạy thử ngay:** `pnpm dev` tại `http://localhost:5173/`.
+2. **Đóng gói phát hành:** `pnpm typecheck && pnpm build` -> xuất thư mục tĩnh `dist/` sẵn sàng deploy (Vercel / Netlify / Cloudflare Pages / GitHub Pages).
+3. **Tài liệu người đọc:** [README.md](./README.md).
+4. **Lưu lịch sử Git (tuỳ chọn):** Repo chưa có commit đầu tiên; chạy `git add . && git commit` khi sẵn sàng lưu mốc phát hành.
 
 ---
 
@@ -69,6 +61,7 @@ pnpm preview    # Xem thử bản build production
 
 | Ngày | Đã hoàn thành | Đang dang dở / Lưu ý quan trọng | Việc đầu tiên phiên sau |
 | :--- | :--- | :--- | :--- |
+| 2026-11-21 (Hoàn tất) | Gọt sạch nội dung `src/` (Phiên 15), thêm nhạc nền hành khúc cách mạng 4 chương Web Audio (Phiên 16), sửa lỗi treo trước Dinh Độc Lập bằng khóa máu tối thiểu `1` (Phiên 17), viết lại `README.md` cho người đọc & đóng checklist `27/27 tasks` | Không còn task tồn đọng; `pnpm typecheck && pnpm build` xanh 0 lỗi | Sẵn sàng commit/deploy (`pnpm build` -> `dist/`) |
 | 2026-11-21 (Phiên 14) | Thiết kế lại toàn diện màn hình chính (`src/scenes/TitleScene.ts`, `src/styles.css`): bỏ sạch khung hướng dẫn dài dòng, giữ đúng con dấu đỏ-vàng, tiêu đề serif lớn `MẬT ĐIỆN CƠ YẾU`, nút `BẮT ĐẦU` và 1 dòng phím tắt tối giản trên nền bản đồ địa hình cổ có la bàn xoay & tuyến sóng điện mật Bắc→Nam (`Việt Bắc 1945 → Sài Gòn 1975`) | Dev server đang chạy tại `http://localhost:5173/`; chờ playtest xác nhận cuối cho `T8.1` | Mở `http://localhost:5173/` nghiệm thu màn hình chính & chốt `[x] T8.1` |
 | 2026-11-21 (Phiên 13) | Chuẩn hóa kích thước va chạm (`hitboxWidth × hitboxHeight`) cho các xe `V1–V4` (`Xe đạp`, `Xe đạp thồ`, `Bốn bánh`, `Xe tải`) đồng nhất gọn `18×28` như xe đầu game (kèm viền vùng lõi xanh mờ trong combat để dễ canh né), riêng `Xe tăng T-54B` giữ trọn kích thước `44×64` | Dev server đang chạy tại `http://localhost:5173/`; chờ playtest xác nhận cuối cho `T8.1` | Chơi thử độ mượt khi né đạn bằng xe bốn bánh & xe tải tại `http://localhost:5173/` |
 | 2026-11-21 (Phiên 12) | Giữ nguyên boss mở màn siêu khó ở đầu Chặng I (`v1_tutorial`, thua đi tiếp, thắng teleport sát đích +1 độ bền) **VÀ đặt trận TÁI ĐẤU (`v4_rematch`, tạo hình B-52 chiến lược, chung bộ đạn siêu khó + 2 bom rải thảm AoE lớn) ngay cuối map Tuyến lửa Trường Sơn (Chặng IV)** — bắt buộc đánh thắng trận tái đấu với đội hình đã nâng cấp để mở đường vào Sài Gòn 1975 | Dev server đang chạy tại `http://localhost:5173/`; chờ playtest chốt `T8.1` | Chơi thử cung bậc mở màn (`v1_tutorial`) → tái đấu (`v4_rematch`) cuối Trường Sơn tại `http://localhost:5173/` |

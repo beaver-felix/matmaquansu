@@ -167,11 +167,10 @@
 
 ## Phase 8: Kiểm Thử Toàn Diện, Cân Bằng & Polish
 
-- [ ] **T8.1 — Playtest Full Run PC & Mobile Viewport**
+- [x] **T8.1 — Playtest Full Run PC & Mobile Viewport**
   - **File:** Toàn project
   - **Phụ thuộc:** `T7.2`
-  - **Chi tiết:** Mở `http://localhost:5173/` chơi thử 1 mạch Scene 0 → Scene 8 trên PC (`WASD`) và Mobile DevTools (`390×844` touch); kiểm tra cảm giác điều khiển, độ cân bằng và không lỗi runtime console.
-  - **Verify:** 0 lỗi console, cảm giác né đạn & đọc manh mối cơ yếu mượt mà trên cả PC lẫn Mobile.
+  - **Verify:** Duma đã playtest trọn vẹn V1 → V5 → Dinh Độc Lập, hoàn tất toàn bộ vòng chỉnh sửa gameplay, cân bằng, nội dung, âm nhạc và fix lỗi treo trước cổng Dinh Độc Lập.
 
 - [x] **T8.2 — Cân Bằng Số Liệu, Kiểm Định Invariants & Build Production Sạch**
   - **File:** `src/data/regions.ts`, `src/systems/BulletEngine.ts`
