@@ -6,13 +6,16 @@ import { LoreToastUI } from './LoreToastUI';
 
 export class DeveloperSettingsUI {
   private dialog = document.createElement('dialog');
+  private button = document.createElement('button');
 
-  constructor(host: HTMLElement, state: GameState, input: InputManager, scenes: SceneManager, lore: LoreToastUI) {
-    const button = document.createElement('button');
+  constructor(private host: HTMLElement, private state: GameState, input: InputManager, scenes: SceneManager, lore: LoreToastUI) {
+    const button = this.button;
     button.className = 'btn btn-small developer-button';
     button.textContent = 'DEV · CÀI ĐẶT';
     button.setAttribute('aria-haspopup', 'dialog');
     button.setAttribute('aria-controls', 'developer-settings');
+    button.addEventListener('keydown', (event) => event.stopPropagation());
+    button.addEventListener('keyup', (event) => event.stopPropagation());
 
     this.dialog.id = 'developer-settings';
     this.dialog.className = 'developer-settings';
@@ -50,7 +53,25 @@ export class DeveloperSettingsUI {
       this.dialog.close();
     });
     this.dialog.querySelector('#developer-close')!.addEventListener('click', () => this.dialog.close());
-    this.dialog.addEventListener('close', () => input.setEnabled(true));
+    this.dialog.addEventListener('keydown', (event) => event.stopPropagation());
+    this.dialog.addEventListener('keyup', (event) => event.stopPropagation());
+    this.dialog.addEventListener('close', () => {
+      input.setEnabled(true);
+      const canvas = host.querySelector('canvas');
+      if (canvas) {
+        canvas.tabIndex = -1;
+        canvas.focus({ preventScroll: true });
+      }
+    });
+  }
+
+  sync(): void {
+    const target = this.host.querySelector('.hud-controls, .title-topbar') ?? this.host;
+    if (this.button.parentElement !== target) target.appendChild(this.button);
+    this.button.classList.toggle('developer-floating', target === this.host);
+    this.button.classList.toggle('developer-active', this.state.invincible);
+    const label = this.state.invincible ? 'DEV · BẤT TỬ: BẬT' : 'DEV · CÀI ĐẶT';
+    if (this.button.textContent !== label) this.button.textContent = label;
   }
 
   get isOpen(): boolean {

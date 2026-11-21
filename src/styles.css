@@ -1083,7 +1083,7 @@ body,
 
 
 
-.developer-button {
+.developer-floating {
   position: absolute;
   right: 12px;
   bottom: 12px;
@@ -1112,3 +1112,9 @@ body,
 .developer-settings select { width: 100%; padding: 10px; font: inherit; }
 .developer-toggle input { width: 20px; height: 20px; vertical-align: middle; }
 .developer-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+
+.developer-active {
+  background: #1c7c4a;
+  border-color: #145b36;
+  color: #fff;
+}

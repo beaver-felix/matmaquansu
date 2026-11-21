@@ -112,6 +112,7 @@ async function bootstrap(): Promise<void> {
   });
 
   app.ticker.add((ticker: Ticker) => {
+    developerSettings.sync();
     if (developerSettings.isOpen) return;
     const dt = Math.min(ticker.deltaMS / 1000, 0.05);
     scenes.update(dt);
