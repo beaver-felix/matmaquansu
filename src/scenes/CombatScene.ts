@@ -97,6 +97,7 @@ export class CombatScene implements GameScene {
   private hudObserver?: ResizeObserver;
   private viewportWidth = 0;
   private viewportHeight = 0;
+  private bottomInset = 16;
   private elapsed = 0;
   private shakeTimer = 0;
   private statePhase: 'FIGHT' | 'VICTORY_HOLD' | 'MODAL' = 'FIGHT';
@@ -311,7 +312,8 @@ export class CombatScene implements GameScene {
     this.arenaLeft = sideMargin;
     this.arenaTop = topMargin;
     this.arenaWidth = Math.max(1, width - sideMargin * 2);
-    this.arenaHeight = Math.max(1, height - topMargin - 16);
+    this.bottomInset = this.loreToast.getReservedBottom();
+    this.arenaHeight = Math.max(1, height - topMargin - this.bottomInset);
     this.prepBarEl.style.top = `${topMargin + 8}px`;
 
     const mapX = (x: number): number => this.arenaLeft + (x - oldLeft) / oldWidth * this.arenaWidth;
@@ -327,6 +329,11 @@ export class CombatScene implements GameScene {
       pickup.sprite.position.set(pickup.x, pickup.y);
     }
 
+    if (this.elapsed > 0 && (oldLeft !== this.arenaLeft || oldTop !== this.arenaTop ||
+      oldWidth !== this.arenaWidth || oldHeight !== this.arenaHeight)) {
+      this.bullets.clearAll();
+      this.invulnTimer = Math.max(this.invulnTimer, 0.75);
+    }
     this.drawDaylightArena(width, height);
   }
 
@@ -352,6 +359,9 @@ export class CombatScene implements GameScene {
   }
 
   update(dt: number): void {
+    if (this.bottomInset !== this.loreToast.getReservedBottom()) {
+      this.resize(this.viewportWidth, this.viewportHeight);
+    }
     this.syncAutoFireButton();
     this.updateSparks(dt);
     this.hitTimer = Math.max(0, this.hitTimer - dt);
@@ -359,7 +369,7 @@ export class CombatScene implements GameScene {
     this.enemySprite.tint = this.hitTimer > 0.24 ? 0xffd17a : 0xffffff;
     this.hitLabel.visible = this.hitTimer > 0;
     this.hitLabel.alpha = Math.min(1, this.hitTimer / 0.16);
-    this.hitLabel.y -= dt * 28;
+    this.hitLabel.y = Math.max(this.arenaTop + 14, this.hitLabel.y - dt * 28);
 
     if (this.shakeTimer > 0) {
       this.shakeTimer = Math.max(0, this.shakeTimer - dt);
@@ -574,7 +584,7 @@ export class CombatScene implements GameScene {
     this.hitTimer = 0.32;
     this.enemySprite.tint = 0xffd17a;
     this.hitLabel.text = `−${Number(dealt.toFixed(1))}`;
-    this.hitLabel.position.set(this.enemyX, this.enemyY - 48);
+    this.hitLabel.position.set(this.enemyX, Math.max(this.arenaTop + 14, this.enemyY - 48));
     this.hitLabel.visible = true;
     this.hitLabel.alpha = 1;
     this.spawnSparks(this.enemyX, this.enemyY + 16, 4, 0xffc857);
