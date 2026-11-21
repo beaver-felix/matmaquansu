@@ -1,4 +1,4 @@
-import { Container, Graphics, Text } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import { AudioEngine } from '../core/AudioEngine';
 import { ActiveAmbushContext, FactionId, GameState } from '../core/GameState';
 import { InputManager } from '../core/InputManager';
@@ -88,11 +88,6 @@ export class CombatScene implements GameScene {
 
   private hitTimer = 0;
   private hitSoundCooldown = 0;
-  private hitLabel = new Text({
-    text: '',
-    style: { fontFamily: 'sans-serif', fontSize: 18, fontWeight: 'bold', fill: 0xffe39a,
-      stroke: { color: 0x482c14, width: 3 } }
-  });
   private hudHeader!: HTMLDivElement;
   private hudObserver?: ResizeObserver;
   private viewportWidth = 0;
@@ -139,9 +134,6 @@ export class CombatScene implements GameScene {
     this.root.addChild(this.actorContainer);
     this.root.addChild(this.fxContainer);
 
-    this.hitLabel.anchor.set(0.5);
-    this.hitLabel.visible = false;
-    this.fxContainer.addChild(this.hitLabel);
 
     this.bullets = new BulletEngine(this.bulletContainer, 640);
     this.shotCount = 0;
@@ -355,9 +347,6 @@ export class CombatScene implements GameScene {
     this.hitTimer = Math.max(0, this.hitTimer - dt);
     this.hitSoundCooldown = Math.max(0, this.hitSoundCooldown - dt);
     this.enemySprite.tint = this.hitTimer > 0.24 ? 0xffd17a : 0xffffff;
-    this.hitLabel.visible = this.hitTimer > 0;
-    this.hitLabel.alpha = Math.min(1, this.hitTimer / 0.16);
-    this.hitLabel.y = Math.max(this.arenaTop + 14, this.hitLabel.y - dt * 28);
 
     if (this.shakeTimer > 0) {
       this.shakeTimer = Math.max(0, this.shakeTimer - dt);
@@ -567,14 +556,9 @@ export class CombatScene implements GameScene {
 
   private onEnemyDamaged(damage: number): void {
     if (this.statePhase !== 'FIGHT') return;
-    const dealt = Math.min(this.enemyHp, damage);
     this.enemyHp = Math.max(0, this.enemyHp - damage);
     this.hitTimer = 0.32;
     this.enemySprite.tint = 0xffd17a;
-    this.hitLabel.text = `−${Number(dealt.toFixed(1))}`;
-    this.hitLabel.position.set(this.enemyX, Math.max(this.arenaTop + 14, this.enemyY - 48));
-    this.hitLabel.visible = true;
-    this.hitLabel.alpha = 1;
     this.spawnSparks(this.enemyX, this.enemyY + 16, 4, 0xffc857);
     if (this.hitSoundCooldown <= 0) {
       this.audio.playEnemyHit();
