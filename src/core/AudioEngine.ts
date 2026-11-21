@@ -512,6 +512,10 @@ export class AudioEngine {
     this.tone(540, 0.042, 'triangle', 0.022, 0, 310);
   }
 
+  playEnemyHit(): void {
+    this.tone(880, 0.045, 'triangle', 0.035, 0, 1320);
+  }
+
   playHit(): void {
     this.tone(180, 0.16, 'sawtooth', 0.12, 0, 52);
   }

@@ -1047,3 +1047,42 @@ body,
   margin: 0 0 18px;
   white-space: pre-line;
 }
+
+/* Keep combat controls above the full-width arena, including wrapped mobile rows. */
+.combat-header {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.combat-hud .hud-top,
+.combat-hud .combat-boss-bar {
+  position: static;
+  transform: none;
+}
+
+.combat-hud .hud-controls {
+  flex-wrap: wrap;
+}
+
+.combat-hud .combat-boss-bar {
+  width: 100%;
+}
+
+.combat-hud .combat-boss-header {
+  gap: 8px;
+}
+
+#cb-boss-text {
+  white-space: nowrap;
+}
+
+#cb-cheat[aria-pressed='true'] {
+  background: #1c7c4a;
+  border-color: #145b36;
+  color: #fff;
+}

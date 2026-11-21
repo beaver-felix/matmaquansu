@@ -13,6 +13,10 @@ Xây dựng bằng `Vite` + `TypeScript` + `PixiJS` (WebGL) và Web Audio thuầ
 | **Máy tính** | `WASD` hoặc phím mũi tên để di chuyển · `Space` bật/tắt tự ngắm bắn |
 | **Điện thoại** | Chạm & kéo trực tiếp trên màn hình (ngón tay không che xe & đạn) |
 
+Trong giao tranh, nút **BẤT TỬ: BẬT/TẮT** bật chế độ gian lận: không mất độ bền hoặc giáp hồi sinh khi trúng đạn/bom. Có thể bật/tắt bất cứ lúc nào trong trận; lựa chọn giữ qua các trận và tắt khi bắt đầu lượt chơi mới.
+
+Trúng địch có tia lửa vàng, nháy sáng, số sát thương và âm thanh phản hồi ngay. Sân giao tranh trải rộng theo màn hình, bên dưới thanh điều khiển.
+
 ### Cơ chế cốt lõi
 1. **Bản đồ mở theo đường mòn (5 chặng, 1945–1975)**: Xe chạy bám theo mạng lưới đường mòn phân nhánh tới trạm đích. Các ổ phục kích ẩn kín trên đường; mỗi chặng chỉ có **đúng 1 nhánh sạch** để lách qua nếu đọc tốt tín hiệu Cơ yếu.
 2. **Cải tiến Cơ yếu theo cột mốc lịch sử**: Rời mỗi chặng được đọc hồ sơ chiến trường, tự động nâng cấp phương tiện (`Xe đạp` → `Xe đạp thồ` → `Xe bốn bánh` → `Xe tải Trường Sơn` → `Xe tăng T-54B`) và chọn 1 trong 3 cải tiến Cơ yếu (radar quét vùng bẫy, tín hiệu viền màn hình + nhịp Morse, gợi ý mật mã địa hình, giải mã nhánh an toàn).

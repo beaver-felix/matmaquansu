@@ -2,6 +2,18 @@ import { Container, Graphics } from 'pixi.js';
 import { BossRole, FactionId } from '../core/GameState';
 import { VehicleConfig } from '../data/vehicles';
 
+function drawTracks(g: Graphics, width: number, height: number, trackWidth: number): void {
+  for (const x of [-width / 2, width / 2 - trackWidth]) {
+    g.roundRect(x, -height / 2, trackWidth, height, 3)
+      .fill({ color: 0x202924 }).stroke({ color: 0x101813, width: 1.5 });
+    g.rect(x + 2, -height / 2 + 3, 2, height - 6).fill({ color: 0x788074 });
+    for (let y = -height / 2 + 4; y < height / 2 - 2; y += 5) {
+      g.moveTo(x + 1, y).lineTo(x + trackWidth - 1, y)
+        .stroke({ color: 0x525e52, width: 1.5 });
+    }
+  }
+}
+
 /**
  * Draws player vehicles at exact chassis dimensions (facing up / -Y).
  */
@@ -76,23 +88,33 @@ export function createVehicleSprite(vehicle: VehicleConfig, showHullOutline = fa
       break;
     }
     case 'tank': {
-      g.roundRect(-hw, -hh + 3, 9, h - 6, 2).fill({ color: 0x1d201d }).stroke({ color: 0x3b403b, width: 1 });
-      g.roundRect(hw - 9, -hh + 3, 9, h - 6, 2).fill({ color: 0x1d201d }).stroke({ color: 0x3b403b, width: 1 });
-      for (let ty = -hh + 7; ty < hh - 5; ty += 6) {
-        g.moveTo(-hw + 1, ty).lineTo(-hw + 8, ty).stroke({ color: 0x494f49, width: 1 });
-        g.moveTo(hw - 8, ty).lineTo(hw - 1, ty).stroke({ color: 0x494f49, width: 1 });
+      drawTracks(g, w, h - 4, 9);
+      g.poly([-hw + 8, -hh + 10, -hw + 12, -hh + 5, hw - 12, -hh + 5,
+        hw - 8, -hh + 10, hw - 8, hh - 6, -hw + 8, hh - 6])
+        .fill({ color: vehicle.bodyColor }).stroke({ color: 0x1c3423, width: 1.5 });
+      g.poly([-hw + 8, -hh + 10, hw - 8, -hh + 10, hw - 10, -hh + 2, -hw + 10, -hh + 2])
+        .fill({ color: 0x87a36a }).stroke({ color: 0x31472c, width: 1 });
+      g.rect(-hw + 8, -hh + 12, 3, h - 22).fill({ color: 0x9bb477, alpha: 0.65 });
+      g.rect(hw - 11, -hh + 12, 3, h - 22).fill({ color: 0x243e28 });
+      g.roundRect(-10, hh - 20, 20, 12, 2).fill({ color: 0x22382a });
+      for (let y = hh - 18; y < hh - 9; y += 3) {
+        g.moveTo(-8, y).lineTo(8, y).stroke({ color: 0x66835b, width: 1 });
       }
-      g.roundRect(-hw + 7, -hh + 6, w - 14, h - 12, 4)
-        .fill({ color: vehicle.bodyColor })
-        .stroke({ color: 0x1d3520, width: 2 });
-      g.rect(-hw + 11, hh - 16, w - 22, 8).fill({ color: 0x26442a });
-      g.ellipse(0, 1, 13, 14)
-        .fill({ color: 0x4c8554 })
-        .stroke({ color: 0x1d3520, width: 1.6 });
-      g.rect(-3, -hh - 6, 6, 28).fill({ color: 0x2f5a35 }).stroke({ color: 0x1a301d, width: 1.2 });
-      g.rect(-4, -hh - 7, 8, 4).fill({ color: 0x628c67 });
-      g.circle(0, 1, 5.5).fill({ color: 0xd92626 });
-      g.circle(0, 1, 2.3).fill({ color: 0xffe45c });
+      g.ellipse(2, 2, 14, 15).fill({ color: 0x14271d, alpha: 0.4 });
+      g.ellipse(0, -1, 13, 14).fill({ color: 0x5f8751 }).stroke({ color: 0x203b29, width: 1.5 });
+      g.ellipse(-3, -4, 8, 10).fill({ color: 0x88a56a, alpha: 0.6 });
+      g.roundRect(-5, -16, 10, 8, 2).fill({ color: 0x4a6740 }).stroke({ color: 0x203b29, width: 1 });
+      g.rect(-2.5, -hh + 1, 5, 20).fill({ color: 0x47603d }).stroke({ color: 0x203b29, width: 1 });
+      g.rect(-1.5, -hh + 2, 1.5, 18).fill({ color: 0xa5b584 });
+      g.rect(-3.5, -hh, 7, 4).fill({ color: 0x24392a });
+      g.circle(5, 3, 4).fill({ color: 0x355435 }).stroke({ color: 0xa1b77d, width: 1 });
+      g.moveTo(5, 3).lineTo(7, 1).stroke({ color: 0x1d3223, width: 1 });
+      g.circle(-5, 1, 4.5).fill({ color: 0xb62e26 });
+      g.star(-5, 1, 5, 3.4, 1.5).fill({ color: vehicle.accentColor });
+      for (const x of [-11, 7]) {
+        g.roundRect(x, hh - 7, 4, 5, 1).fill({ color: 0x9b895c }).stroke({ color: 0x3c432c, width: 1 });
+      }
+
       break;
     }
   }
@@ -214,14 +236,27 @@ export function createEnemySprite(faction: FactionId, bossRole: BossRole): Conta
     }
 
     case 'nguy': {
-      // M113 Armored Patrol Vehicle facing +Y
-      g.roundRect(-30, -26, 60, 52, 6).fill({ color: 0x4c5e4e }).stroke({ color: 0x222d24, width: 2 });
-      g.rect(-34, -22, 6, 44).fill({ color: 0x242925 });
-      g.rect(28, -22, 6, 44).fill({ color: 0x242925 });
-      g.rect(-20, -16, 40, 28).fill({ color: 0x3a4a3c });
-      g.circle(0, 2, 11).fill({ color: 0x5c735f }).stroke({ color: 0x1e261f, width: 1.5 });
-      g.rect(-3, 8, 6, 20).fill({ color: 0x1f2420 });
-      g.circle(0, 2, 4.5).fill({ color: 0xd96b14 });
+      // M113 patrol vehicle, facing down.
+      g.roundRect(-30, -23, 66, 54, 6).fill({ color: 0x18251b, alpha: 0.2 });
+      drawTracks(g, 68, 50, 9);
+      g.poly([-25, -25, 25, -25, 28, 17, 20, 26, -20, 26, -28, 17])
+        .fill({ color: 0x60745a }).stroke({ color: 0x26382a, width: 2 });
+      g.poly([-28, 17, 28, 17, 20, 26, -20, 26]).fill({ color: 0x8d9c74 });
+      g.rect(-24, -22, 3, 36).fill({ color: 0xa7b18a });
+      g.roundRect(-17, -18, 22, 16, 2).fill({ color: 0x3b5140 }).stroke({ color: 0x8e9e7b, width: 1 });
+      for (let y = -15; y < -3; y += 3) {
+        g.moveTo(-14, y).lineTo(2, y).stroke({ color: 0x23392c, width: 1.5 });
+      }
+      g.circle(8, 5, 11).fill({ color: 0x263d2b, alpha: 0.5 });
+      g.circle(6, 3, 10).fill({ color: 0x7c9169 }).stroke({ color: 0x283d2d, width: 1.5 });
+      g.circle(6, 3, 6).fill({ color: 0x4a6349 }).stroke({ color: 0xa0b084, width: 1 });
+      g.rect(3, 8, 5, 20).fill({ color: 0x24362a });
+      g.rect(4, 9, 1.5, 17).fill({ color: 0x9caa8d });
+      g.star(-12, 8, 5, 5, 2.2).fill({ color: 0xf0ddac });
+      for (const x of [-19, 15]) {
+        g.rect(x, 21, 4, 3).fill({ color: 0xffdc87 });
+      }
+
       break;
     }
 

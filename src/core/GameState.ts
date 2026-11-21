@@ -44,6 +44,7 @@ export class GameState {
   /** Active when Mã Dịch Song Song is pulsing before combat */
   pipelineSlowActive = false;
 
+  invincible = false;
   autoFire = true;
 
   stats: RunStats = {
@@ -70,6 +71,7 @@ export class GameState {
     this.savedMapPos = null;
     this.activeAmbush = null;
     this.pipelineSlowActive = false;
+    this.invincible = false;
     this.autoFire = true;
     this.stats = {
       ambushesEvaded: 0,

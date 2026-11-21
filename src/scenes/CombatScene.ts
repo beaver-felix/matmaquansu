@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, Text } from 'pixi.js';
 import { AudioEngine } from '../core/AudioEngine';
 import { ActiveAmbushContext, FactionId, GameState } from '../core/GameState';
 import { InputManager } from '../core/InputManager';
@@ -86,6 +86,17 @@ export class CombatScene implements GameScene {
   private pickupsSpawned = 0;
   private sparks: Spark[] = [];
 
+  private hitTimer = 0;
+  private hitSoundCooldown = 0;
+  private hitLabel = new Text({
+    text: '',
+    style: { fontFamily: 'sans-serif', fontSize: 18, fontWeight: 'bold', fill: 0xffe39a,
+      stroke: { color: 0x482c14, width: 3 } }
+  });
+  private hudHeader!: HTMLDivElement;
+  private hudObserver?: ResizeObserver;
+  private viewportWidth = 0;
+  private viewportHeight = 0;
   private elapsed = 0;
   private shakeTimer = 0;
   private statePhase: 'FIGHT' | 'VICTORY_HOLD' | 'MODAL' = 'FIGHT';
@@ -126,6 +137,10 @@ export class CombatScene implements GameScene {
     this.root.addChild(this.bulletContainer);
     this.root.addChild(this.actorContainer);
     this.root.addChild(this.fxContainer);
+
+    this.hitLabel.anchor.set(0.5);
+    this.hitLabel.visible = false;
+    this.fxContainer.addChild(this.hitLabel);
 
     this.bullets = new BulletEngine(this.bulletContainer, 640);
     this.shotCount = 0;
@@ -180,8 +195,9 @@ export class CombatScene implements GameScene {
   private buildHud(uiRoot: HTMLElement): void {
     const v = this.state.currentVehicle;
     const hud = document.createElement('div');
-    hud.className = 'hud-layer';
+    hud.className = 'hud-layer combat-hud';
     hud.innerHTML = `
+      <div class="combat-header">
       <div class="hud-top">
         <div class="hud-pill">
           <div><strong>GIAO TRANH PHỤC KÍCH</strong> · ${v.name}</div>
@@ -194,6 +210,7 @@ export class CombatScene implements GameScene {
         </div>
         <div class="hud-controls">
           <button id="cb-autofire" class="btn btn-small">NẠP ĐẠN: ${PLAYER_FIRE_WARMUP_SEC.toFixed(1)}s</button>
+          <button id="cb-cheat" class="btn btn-small" aria-pressed="false" title="Chế độ gian lận: không nhận sát thương">BẤT TỬ: TẮT</button>
           <button id="cb-mute" class="btn btn-small">${this.audio.muted ? '🔇' : '🔊'}</button>
         </div>
       </div>
@@ -206,6 +223,7 @@ export class CombatScene implements GameScene {
         <div class="boss-hp-track"><div class="boss-hp-fill" id="cb-boss-fill" style="width:100%;"></div></div>
       </div>
 
+      </div>
       <div class="weapon-prep-bar" id="cb-prep-bar">
         <div class="weapon-prep-header">
           <span id="cb-prep-label">ĐANG CHUẨN BỊ VŨ KHÍ...</span>
@@ -215,6 +233,22 @@ export class CombatScene implements GameScene {
       </div>
     `;
     uiRoot.appendChild(hud);
+
+    this.hudHeader = hud.querySelector('.combat-header') as HTMLDivElement;
+    this.hudObserver = new ResizeObserver(() => {
+      if (this.viewportWidth > 0) this.resize(this.viewportWidth, this.viewportHeight);
+    });
+    this.hudObserver.observe(this.hudHeader);
+    const cheatBtn = hud.querySelector('#cb-cheat') as HTMLButtonElement;
+    const syncCheat = (): void => {
+      cheatBtn.textContent = this.state.invincible ? 'BẤT TỬ: BẬT' : 'BẤT TỬ: TẮT';
+      cheatBtn.setAttribute('aria-pressed', String(this.state.invincible));
+    };
+    syncCheat();
+    cheatBtn.addEventListener('click', () => {
+      this.state.invincible = !this.state.invincible;
+      syncCheat();
+    });
 
     this.hpFillEl = hud.querySelector('#cb-hp-fill') as HTMLDivElement;
     this.hpTextEl = hud.querySelector('#cb-hp-text') as HTMLSpanElement;
@@ -265,20 +299,32 @@ export class CombatScene implements GameScene {
   }
 
   resize(width: number, height: number): void {
-    const topMargin = 104;
-    const bottomMargin = height > 680 ? 118 : 96;
-    const sideMargin = width > 740 ? Math.max(24, (width - 700) / 2) : 8;
+    this.viewportWidth = width;
+    this.viewportHeight = height;
+    const oldLeft = this.arenaLeft;
+    const oldTop = this.arenaTop;
+    const oldWidth = this.arenaWidth;
+    const oldHeight = this.arenaHeight;
+    const topMargin = this.hudHeader.offsetTop + this.hudHeader.offsetHeight + 8;
+    const sideMargin = width > 740 ? 16 : 8;
 
     this.arenaLeft = sideMargin;
     this.arenaTop = topMargin;
-    this.arenaWidth = Math.max(260, width - sideMargin * 2);
-    this.arenaHeight = Math.max(280, height - topMargin - bottomMargin);
+    this.arenaWidth = Math.max(1, width - sideMargin * 2);
+    this.arenaHeight = Math.max(1, height - topMargin - 16);
+    this.prepBarEl.style.top = `${topMargin + 8}px`;
 
-    if (this.elapsed === 0) {
-      this.playerX = this.arenaLeft + this.arenaWidth / 2;
-      this.playerY = this.arenaTop + this.arenaHeight * 0.84;
-      this.enemyX = this.arenaLeft + this.arenaWidth / 2;
-      this.enemyY = this.arenaTop + Math.min(82, this.arenaHeight * 0.18);
+    const mapX = (x: number): number => this.arenaLeft + (x - oldLeft) / oldWidth * this.arenaWidth;
+    const mapY = (y: number): number => this.arenaTop + (y - oldTop) / oldHeight * this.arenaHeight;
+    this.playerX = this.elapsed === 0 ? this.arenaLeft + this.arenaWidth / 2 : mapX(this.playerX);
+    this.playerY = this.elapsed === 0 ? this.arenaTop + this.arenaHeight * 0.84 : mapY(this.playerY);
+    this.enemyX = this.arenaLeft + this.arenaWidth / 2;
+    this.enemyY = this.arenaTop + Math.min(82, this.arenaHeight * 0.18);
+    for (const pickup of this.pickups) {
+      pickup.x = mapX(pickup.x);
+      pickup.baseY = mapY(pickup.baseY);
+      pickup.y = pickup.baseY;
+      pickup.sprite.position.set(pickup.x, pickup.y);
     }
 
     this.drawDaylightArena(width, height);
@@ -308,6 +354,12 @@ export class CombatScene implements GameScene {
   update(dt: number): void {
     this.syncAutoFireButton();
     this.updateSparks(dt);
+    this.hitTimer = Math.max(0, this.hitTimer - dt);
+    this.hitSoundCooldown = Math.max(0, this.hitSoundCooldown - dt);
+    this.enemySprite.tint = this.hitTimer > 0.24 ? 0xffd17a : 0xffffff;
+    this.hitLabel.visible = this.hitTimer > 0;
+    this.hitLabel.alpha = Math.min(1, this.hitTimer / 0.16);
+    this.hitLabel.y -= dt * 28;
 
     if (this.shakeTimer > 0) {
       this.shakeTimer = Math.max(0, this.shakeTimer - dt);
@@ -480,7 +532,7 @@ export class CombatScene implements GameScene {
   }
 
   private onPlayerDamaged(): void {
-    if (this.invulnTimer > 0 || this.statePhase !== 'FIGHT') return;
+    if (this.state.invincible || this.invulnTimer > 0 || this.statePhase !== 'FIGHT') return;
     this.playerHp = Math.max(0, this.playerHp - 1);
     this.invulnTimer = 0.95;
     this.shakeTimer = 0.28;
@@ -517,7 +569,19 @@ export class CombatScene implements GameScene {
 
   private onEnemyDamaged(damage: number): void {
     if (this.statePhase !== 'FIGHT') return;
+    const dealt = Math.min(this.enemyHp, damage);
     this.enemyHp = Math.max(0, this.enemyHp - damage);
+    this.hitTimer = 0.32;
+    this.enemySprite.tint = 0xffd17a;
+    this.hitLabel.text = `−${Number(dealt.toFixed(1))}`;
+    this.hitLabel.position.set(this.enemyX, this.enemyY - 48);
+    this.hitLabel.visible = true;
+    this.hitLabel.alpha = 1;
+    this.spawnSparks(this.enemyX, this.enemyY + 16, 4, 0xffc857);
+    if (this.hitSoundCooldown <= 0) {
+      this.audio.playEnemyHit();
+      this.hitSoundCooldown = 0.09;
+    }
     this.bossFillEl.style.width = `${(this.enemyHp / this.maxEnemyHp) * 100}%`;
     this.bossTextEl.textContent = `${Math.ceil(this.enemyHp)} / ${this.maxEnemyHp}`;
 
@@ -708,6 +772,7 @@ export class CombatScene implements GameScene {
   }
 
   unmount(): void {
+    this.hudObserver?.disconnect();
     this.root.destroy({ children: true });
   }
 }
