@@ -10,6 +10,7 @@ export interface MoveSample {
 }
 
 export class InputManager {
+  private enabled = true;
   private keys = new Set<string>();
   private pointerId: number | null = null;
   private lastPointerX = 0;
@@ -33,6 +34,7 @@ export class InputManager {
   }
 
   private handleKeyDown = (e: KeyboardEvent): void => {
+    if (!this.enabled) return;
     const code = e.code;
     if (
       code === 'KeyW' ||
@@ -62,7 +64,7 @@ export class InputManager {
   };
 
   private handlePointerDown = (e: PointerEvent): void => {
-    if (this.pointerId !== null) return;
+    if (!this.enabled || this.pointerId !== null) return;
     this.pointerId = e.pointerId;
     this.lastPointerX = e.clientX;
     this.lastPointerY = e.clientY;
@@ -109,6 +111,11 @@ export class InputManager {
       dragDy,
       isTouchDragging: this.pointerId !== null
     };
+  }
+
+  setEnabled(enabled: boolean): void {
+    this.enabled = enabled;
+    this.handleBlur();
   }
 
   clearDrag(): void {

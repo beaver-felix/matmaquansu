@@ -10,6 +10,7 @@ import { CutsceneScene } from './scenes/CutsceneScene';
 import { OverworldScene } from './scenes/OverworldScene';
 import { RegionExitOverlay } from './scenes/RegionExitOverlay';
 import { TitleScene } from './scenes/TitleScene';
+import { DeveloperSettingsUI } from './systems/DeveloperSettingsUI';
 import { LoreToastUI } from './systems/LoreToastUI';
 
 async function bootstrap(): Promise<void> {
@@ -103,6 +104,7 @@ async function bootstrap(): Promise<void> {
       )
   );
 
+  const developerSettings = new DeveloperSettingsUI(appEl, state, input, scenes, loreToast);
   scenes.goTo('TITLE');
 
   window.addEventListener('resize', () => {
@@ -110,6 +112,7 @@ async function bootstrap(): Promise<void> {
   });
 
   app.ticker.add((ticker: Ticker) => {
+    if (developerSettings.isOpen) return;
     const dt = Math.min(ticker.deltaMS / 1000, 0.05);
     scenes.update(dt);
     loreToast.update(dt);

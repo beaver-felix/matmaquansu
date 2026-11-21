@@ -1081,8 +1081,34 @@ body,
   white-space: nowrap;
 }
 
-#cb-cheat[aria-pressed='true'] {
-  background: #1c7c4a;
-  border-color: #145b36;
-  color: #fff;
+
+
+.developer-button {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  z-index: 30;
 }
+
+.developer-settings {
+  width: min(460px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  overflow: auto;
+  border: 2px solid var(--panel-border-strong);
+  border-radius: 12px;
+  padding: 24px;
+  color: var(--text-main);
+  background: #fbf7ec;
+  touch-action: pan-y;
+}
+
+.developer-settings::backdrop {
+  background: rgba(20, 28, 20, 0.65);
+}
+
+.developer-settings h2 { margin-top: 0; }
+.developer-settings p { font-size: 14px; line-height: 1.5; }
+.developer-settings label { display: block; margin: 16px 0 8px; }
+.developer-settings select { width: 100%; padding: 10px; font: inherit; }
+.developer-toggle input { width: 20px; height: 20px; vertical-align: middle; }
+.developer-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }

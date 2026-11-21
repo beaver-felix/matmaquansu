@@ -13,7 +13,7 @@ Xây dựng bằng `Vite` + `TypeScript` + `PixiJS` (WebGL) và Web Audio thuầ
 | **Máy tính** | `WASD` hoặc phím mũi tên để di chuyển · `Space` bật/tắt tự ngắm bắn |
 | **Điện thoại** | Chạm & kéo trực tiếp trên màn hình (ngón tay không che xe & đạn) |
 
-Trong giao tranh, nút **BẤT TỬ: BẬT/TẮT** bật chế độ gian lận: không mất độ bền hoặc giáp hồi sinh khi trúng đạn/bom. Có thể bật/tắt bất cứ lúc nào trong trận; lựa chọn giữ qua các trận và tắt khi bắt đầu lượt chơi mới.
+Nút **DEV · CÀI ĐẶT** mở bảng nhà phát triển và tạm dừng trò chơi. Bật **Bất tử** để không nhận sát thương, hoặc chuyển thẳng đến một trong 5 chặng. Chuyển chặng bắt đầu lượt mới với xe/kỹ năng tương ứng, xóa tiến trình cũ và giữ lựa chọn bất tử. Bắt đầu lượt chơi bình thường tắt bất tử.
 
 Trúng địch có tia lửa vàng, nháy sáng, số sát thương và âm thanh phản hồi ngay. Sân giao tranh trải rộng theo màn hình, bên dưới thanh điều khiển.
 

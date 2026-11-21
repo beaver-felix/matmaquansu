@@ -1,5 +1,5 @@
 import { CRYPTO_SKILLS, SkillId } from '../data/skills';
-import { getVehicleByRegion, VehicleConfig } from '../data/vehicles';
+import { getVehicleByRegion, VehicleConfig, VEHICLES } from '../data/vehicles';
 
 export type FactionId = 'phap' | 'phap_plus' | 'nguy' | 'my' | 'nguy_minus';
 export type BossRole = 'standard' | 'tutorial' | 'rematch';
@@ -79,6 +79,17 @@ export class GameState {
       loreCollected: 0,
       startTimeMs: Date.now()
     };
+  }
+
+  startDeveloperLevel(regionIndex: number): void {
+    if (!Number.isInteger(regionIndex) || regionIndex < 0 || regionIndex >= VEHICLES.length) return;
+    const invincible = this.invincible;
+    this.reset();
+    this.invincible = invincible;
+    this.regionIndex = regionIndex;
+    this.tutorialDone = regionIndex > 0;
+    for (const skill of CRYPTO_SKILLS.slice(0, regionIndex)) this.unlockSkill(skill.id);
+    if (regionIndex === VEHICLES.length - 1) this.activateFullNetworkMax();
   }
 
   get currentVehicle(): VehicleConfig {

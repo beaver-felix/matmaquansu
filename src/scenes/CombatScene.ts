@@ -211,7 +211,6 @@ export class CombatScene implements GameScene {
         </div>
         <div class="hud-controls">
           <button id="cb-autofire" class="btn btn-small">NẠP ĐẠN: ${PLAYER_FIRE_WARMUP_SEC.toFixed(1)}s</button>
-          <button id="cb-cheat" class="btn btn-small" aria-pressed="false" title="Chế độ gian lận: không nhận sát thương">BẤT TỬ: TẮT</button>
           <button id="cb-mute" class="btn btn-small">${this.audio.muted ? '🔇' : '🔊'}</button>
         </div>
       </div>
@@ -240,17 +239,6 @@ export class CombatScene implements GameScene {
       if (this.viewportWidth > 0) this.resize(this.viewportWidth, this.viewportHeight);
     });
     this.hudObserver.observe(this.hudHeader);
-    const cheatBtn = hud.querySelector('#cb-cheat') as HTMLButtonElement;
-    const syncCheat = (): void => {
-      cheatBtn.textContent = this.state.invincible ? 'BẤT TỬ: BẬT' : 'BẤT TỬ: TẮT';
-      cheatBtn.setAttribute('aria-pressed', String(this.state.invincible));
-    };
-    syncCheat();
-    cheatBtn.addEventListener('click', () => {
-      this.state.invincible = !this.state.invincible;
-      syncCheat();
-    });
-
     this.hpFillEl = hud.querySelector('#cb-hp-fill') as HTMLDivElement;
     this.hpTextEl = hud.querySelector('#cb-hp-text') as HTMLSpanElement;
     this.shieldTextEl = hud.querySelector('#cb-shield') as HTMLSpanElement;

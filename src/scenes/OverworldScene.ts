@@ -696,6 +696,7 @@ export class OverworldScene implements GameScene {
       () => {
         if (this.finaleInvuln > 0) return;
         // Tank armor never drops below 1 HP in front of Dinh Độc Lập
+        if (this.state.invincible) return;
         this.finaleHp = Math.max(1, this.finaleHp - 1);
         this.finaleInvuln = 0.9;
         this.shakeTimer = 0.22;
