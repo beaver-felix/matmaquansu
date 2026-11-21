@@ -4,129 +4,20 @@ import { VehicleConfig } from '../data/vehicles';
 
 function drawTracks(g: Graphics, width: number, height: number, trackWidth: number): void {
   for (const x of [-width / 2, width / 2 - trackWidth]) {
-    g.roundRect(x, -height / 2, trackWidth, height, trackWidth / 2).fill({ color: 0x17211e });
-    g.roundRect(x + 1, -height / 2 + 2, trackWidth - 2, height - 4, 3).fill({ color: 0x343d34 });
-    for (let y = -height / 2 + 5; y < height / 2 - 3; y += 5) {
-      g.moveTo(x + 1.5, y).lineTo(x + trackWidth - 1.5, y)
-        .stroke({ color: 0x718071, width: 0.8, alpha: 0.55 });
+    g.roundRect(x, -height / 2, trackWidth, height, 3)
+      .fill({ color: 0x202924 }).stroke({ color: 0x101813, width: 1.5 });
+    g.rect(x + 2, -height / 2 + 3, 2, height - 6).fill({ color: 0x788074 });
+    for (let y = -height / 2 + 4; y < height / 2 - 2; y += 5) {
+      g.moveTo(x + 1, y).lineTo(x + trackWidth - 1, y)
+        .stroke({ color: 0x525e52, width: 1.5 });
     }
-    g.moveTo(x + 1, -height / 2 + 4).lineTo(x + 1, height / 2 - 4)
-      .stroke({ color: 0xa7ad8e, width: 0.8, alpha: 0.5 });
   }
-}
-
-function createTankArtwork(vehicle: VehicleConfig, showHullOutline: boolean): Container {
-  const root = new Container();
-  const shadow = new Graphics();
-  shadow.ellipse(2, 5, 23, 28).fill({ color: 0x16251d, alpha: 0.12 });
-  shadow.roundRect(-19, -22, 42, 54, 9).fill({ color: 0x16251d, alpha: 0.16 });
-
-  const chassis = new Graphics();
-  drawTracks(chassis, 44, 54, 8);
-  chassis.poly([-15, -21, 15, -21, 18, -14, 18, 24, 12, 29, -12, 29, -18, 24, -18, -14])
-    .fill({ color: 0x21382b });
-
-  const hull = new Graphics();
-  hull.poly([-13, -24, 13, -24, 17, -16, 17, 23, 12, 27, -12, 27, -17, 23, -17, -16])
-    .fill({ color: vehicle.bodyColor });
-  // Broad armor planes share one upper-left light direction; the dark right edge gives thickness.
-  hull.poly([-13, -24, 13, -24, 17, -16, -17, -16]).fill({ color: 0x98ac79 });
-  hull.poly([13, -23, 17, -16, 17, 23, 12, 27, 12, -14]).fill({ color: 0x2c4b35 });
-  hull.poly([-17, -16, -13, -23, -12, 23, -16, 24]).fill({ color: 0x799660 });
-  hull.moveTo(-12, -23).lineTo(12, -23).stroke({ color: 0xc4cea0, width: 1 });
-  for (const x of [-20, 14]) {
-    hull.roundRect(x, -18, 6, 39, 2).fill({ color: 0x526e46 });
-    hull.moveTo(x + 1, -16).lineTo(x + 1, 18).stroke({ color: 0xa6b387, width: 0.8 });
-  }
-  hull.roundRect(-10, 14, 20, 9, 2).fill({ color: 0x253d2d });
-  for (let y = 16; y < 23; y += 2.5) {
-    hull.moveTo(-8, y).lineTo(8, y).stroke({ color: 0x658156, width: 0.8 });
-  }
-  hull.roundRect(-12, 24, 24, 3, 1.5).fill({ color: 0x88734c });
-
-  const turretShadow = new Graphics();
-  turretShadow.ellipse(3, 3, 14, 14).fill({ color: 0x10291b, alpha: 0.32 });
-  turretShadow.poly([1, -29, 5, -29, 6, -6, 2, -6]).fill({ color: 0x10291b, alpha: 0.24 });
-
-  const turret = new Graphics();
-  turret.moveTo(-8, -12).bezierCurveTo(-16, -7, -15, 5, -8, 10)
-    .bezierCurveTo(-2, 14, 9, 12, 13, 5).bezierCurveTo(16, -2, 10, -12, 4, -14)
-    .closePath().fill({ color: 0x304f36 });
-  turret.moveTo(-8, -14).bezierCurveTo(-15, -9, -15, 2, -8, 7)
-    .bezierCurveTo(-2, 11, 8, 9, 12, 3).bezierCurveTo(15, -4, 9, -14, 3, -16)
-    .closePath().fill({ color: 0x6d8c54 });
-  turret.moveTo(-8, -13).bezierCurveTo(-14, -8, -13, 0, -9, 3)
-    .bezierCurveTo(-9, -4, -4, -11, 3, -14).closePath().fill({ color: 0xa4b780, alpha: 0.8 });
-  turret.moveTo(11, -4).bezierCurveTo(14, 3, 7, 10, 0, 9)
-    .stroke({ color: 0x42643f, width: 2 });
-  turret.ellipse(5, -2, 3.5, 4).fill({ color: 0x3d5c3b });
-  turret.moveTo(2, -4).quadraticCurveTo(5, -7, 8, -3).stroke({ color: 0xaaba86, width: 0.8 });
-  turret.star(-4, 1, 5, 3.2, 1.4).fill({ color: vehicle.accentColor });
-
-  const barrel = new Graphics();
-  barrel.roundRect(-4.5, -17, 9, 7, 2).fill({ color: 0x496c42 });
-  barrel.roundRect(-2.5, -31, 5, 19, 1.3).fill({ color: 0x314e35 });
-  barrel.rect(-1.5, -30, 1.6, 17).fill({ color: 0xb5c591 });
-  barrel.rect(1, -30, 1, 17).fill({ color: 0x1f3729 });
-  barrel.roundRect(-3, -32, 6, 3.5, 1).fill({ color: 0x243c2d });
-  barrel.moveTo(-2, -31).lineTo(2, -31).stroke({ color: 0x8ea77c, width: 0.8 });
-
-  root.addChild(shadow, chassis, hull, turretShadow, turret, barrel);
-  root.scale.set(vehicle.width / 44, vehicle.height / 64);
-  if (showHullOutline) {
-    const hitbox = new Graphics();
-    // Keep the collision guide under the artwork rather than drawing a box across the turret.
-    hitbox.roundRect(-22, -32, 44, 64, 5).stroke({ color: 0x1c7c4a, width: 0.7, alpha: 0.3 });
-    root.addChildAt(hitbox, 1);
-  }
-  return root;
-}
-
-function createPatrolArtwork(): Container {
-  const root = new Container();
-  const shadow = new Graphics();
-  shadow.roundRect(-30, -21, 65, 51, 9).fill({ color: 0x17271f, alpha: 0.2 });
-  const chassis = new Graphics();
-  drawTracks(chassis, 68, 50, 9);
-  chassis.poly([-26, -23, 26, -23, 28, 18, 20, 27, -20, 27, -28, 18]).fill({ color: 0x253a32 });
-
-  const hull = new Graphics();
-  hull.poly([-24, -26, 24, -26, 27, 13, 18, 23, -18, 23, -27, 13]).fill({ color: 0x627968 });
-  hull.poly([-27, 13, 27, 13, 18, 23, -18, 23]).fill({ color: 0x83947a });
-  hull.poly([24, -26, 27, 13, 18, 23, 20, 10, 20, -23]).fill({ color: 0x344e42 });
-  hull.moveTo(-24, 12).lineTo(-22, -24).lineTo(22, -24).stroke({ color: 0xa9b79a, width: 1.5 });
-  for (const x of [-30, 24]) {
-    hull.roundRect(x, -21, 6, 39, 2).fill({ color: 0x536d5b });
-    hull.moveTo(x + 1, -19).lineTo(x + 1, 16).stroke({ color: 0x94a489, width: 0.8 });
-  }
-  hull.roundRect(-18, -19, 21, 16, 2).fill({ color: 0x354f42 });
-  for (let y = -16; y < -5; y += 3) {
-    hull.moveTo(-15, y).lineTo(0, y).stroke({ color: 0x758a70, width: 0.8 });
-  }
-  hull.roundRect(9, -20, 8, 10, 2).fill({ color: 0x778b71 });
-  hull.moveTo(10, -19).lineTo(15, -19).stroke({ color: 0xb4bfa2, width: 1 });
-  hull.star(-12, 5, 5, 4, 1.8).fill({ color: 0xe6dfbc });
-  for (const x of [-19, 15]) {
-    hull.roundRect(x, 18, 4, 2, 1).fill({ color: 0xe7cf91 });
-  }
-
-  const mount = new Graphics();
-  mount.ellipse(9, 3, 10, 9).fill({ color: 0x1d3629, alpha: 0.35 });
-  mount.ellipse(6, 0, 9, 8).fill({ color: 0x355342 });
-  mount.ellipse(5, -2, 8, 7).fill({ color: 0x8b9e7d });
-  mount.moveTo(-2, -3).quadraticCurveTo(1, -10, 8, -7).stroke({ color: 0xb8c5a1, width: 1 });
-  mount.roundRect(2, 0, 6, 8, 1.5).fill({ color: 0x4b6650 });
-  mount.roundRect(3, 5, 4, 22, 1).fill({ color: 0x263e31 });
-  mount.rect(3.5, 6, 1, 19).fill({ color: 0xa7b69a });
-  root.addChild(shadow, chassis, hull, mount);
-  return root;
 }
 
 /**
  * Draws player vehicles at exact chassis dimensions (facing up / -Y).
  */
 export function createVehicleSprite(vehicle: VehicleConfig, showHullOutline = false): Container {
-  if (vehicle.id === 'tank') return createTankArtwork(vehicle, showHullOutline);
   const root = new Container();
   const w = vehicle.width;
   const h = vehicle.height;
@@ -196,7 +87,36 @@ export function createVehicleSprite(vehicle: VehicleConfig, showHullOutline = fa
       g.rect(hw - 11, -hh + 1, 5, 2.5).fill({ color: 0xfff3b0 });
       break;
     }
+    case 'tank': {
+      drawTracks(g, w, h - 4, 9);
+      g.poly([-hw + 8, -hh + 10, -hw + 12, -hh + 5, hw - 12, -hh + 5,
+        hw - 8, -hh + 10, hw - 8, hh - 6, -hw + 8, hh - 6])
+        .fill({ color: vehicle.bodyColor }).stroke({ color: 0x1c3423, width: 1.5 });
+      g.poly([-hw + 8, -hh + 10, hw - 8, -hh + 10, hw - 10, -hh + 2, -hw + 10, -hh + 2])
+        .fill({ color: 0x87a36a }).stroke({ color: 0x31472c, width: 1 });
+      g.rect(-hw + 8, -hh + 12, 3, h - 22).fill({ color: 0x9bb477, alpha: 0.65 });
+      g.rect(hw - 11, -hh + 12, 3, h - 22).fill({ color: 0x243e28 });
+      g.roundRect(-10, hh - 20, 20, 12, 2).fill({ color: 0x22382a });
+      for (let y = hh - 18; y < hh - 9; y += 3) {
+        g.moveTo(-8, y).lineTo(8, y).stroke({ color: 0x66835b, width: 1 });
+      }
+      g.ellipse(2, 2, 14, 15).fill({ color: 0x14271d, alpha: 0.4 });
+      g.ellipse(0, -1, 13, 14).fill({ color: 0x5f8751 }).stroke({ color: 0x203b29, width: 1.5 });
+      g.ellipse(-3, -4, 8, 10).fill({ color: 0x88a56a, alpha: 0.6 });
+      g.roundRect(-5, -16, 10, 8, 2).fill({ color: 0x4a6740 }).stroke({ color: 0x203b29, width: 1 });
+      g.rect(-2.5, -hh + 1, 5, 20).fill({ color: 0x47603d }).stroke({ color: 0x203b29, width: 1 });
+      g.rect(-1.5, -hh + 2, 1.5, 18).fill({ color: 0xa5b584 });
+      g.rect(-3.5, -hh, 7, 4).fill({ color: 0x24392a });
+      g.circle(5, 3, 4).fill({ color: 0x355435 }).stroke({ color: 0xa1b77d, width: 1 });
+      g.moveTo(5, 3).lineTo(7, 1).stroke({ color: 0x1d3223, width: 1 });
+      g.circle(-5, 1, 4.5).fill({ color: 0xb62e26 });
+      g.star(-5, 1, 5, 3.4, 1.5).fill({ color: vehicle.accentColor });
+      for (const x of [-11, 7]) {
+        g.roundRect(x, hh - 7, 4, 5, 1).fill({ color: 0x9b895c }).stroke({ color: 0x3c432c, width: 1 });
+      }
 
+      break;
+    }
   }
 
   if (showHullOutline) {
@@ -316,9 +236,28 @@ export function createEnemySprite(faction: FactionId, bossRole: BossRole): Conta
     }
 
     case 'nguy': {
-      g.destroy();
-      c.destroy();
-      return createPatrolArtwork();
+      // M113 patrol vehicle, facing down.
+      g.roundRect(-30, -23, 66, 54, 6).fill({ color: 0x18251b, alpha: 0.2 });
+      drawTracks(g, 68, 50, 9);
+      g.poly([-25, -25, 25, -25, 28, 17, 20, 26, -20, 26, -28, 17])
+        .fill({ color: 0x60745a }).stroke({ color: 0x26382a, width: 2 });
+      g.poly([-28, 17, 28, 17, 20, 26, -20, 26]).fill({ color: 0x8d9c74 });
+      g.rect(-24, -22, 3, 36).fill({ color: 0xa7b18a });
+      g.roundRect(-17, -18, 22, 16, 2).fill({ color: 0x3b5140 }).stroke({ color: 0x8e9e7b, width: 1 });
+      for (let y = -15; y < -3; y += 3) {
+        g.moveTo(-14, y).lineTo(2, y).stroke({ color: 0x23392c, width: 1.5 });
+      }
+      g.circle(8, 5, 11).fill({ color: 0x263d2b, alpha: 0.5 });
+      g.circle(6, 3, 10).fill({ color: 0x7c9169 }).stroke({ color: 0x283d2d, width: 1.5 });
+      g.circle(6, 3, 6).fill({ color: 0x4a6349 }).stroke({ color: 0xa0b084, width: 1 });
+      g.rect(3, 8, 5, 20).fill({ color: 0x24362a });
+      g.rect(4, 9, 1.5, 17).fill({ color: 0x9caa8d });
+      g.star(-12, 8, 5, 5, 2.2).fill({ color: 0xf0ddac });
+      for (const x of [-19, 15]) {
+        g.rect(x, 21, 4, 3).fill({ color: 0xffdc87 });
+      }
+
+      break;
     }
 
     case 'my': {
