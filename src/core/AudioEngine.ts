@@ -513,7 +513,9 @@ export class AudioEngine {
   }
 
   playEnemyHit(): void {
-    this.tone(880, 0.045, 'triangle', 0.035, 0, 1320);
+    const pitch = 0.92 + Math.random() * 0.16;
+    this.tone(1450 * pitch, 0.035, 'triangle', 0.04, 0, 530);
+    this.tone(2340 * pitch, 0.055, 'sine', 0.022, 0, 1100);
   }
 
   playHit(): void {

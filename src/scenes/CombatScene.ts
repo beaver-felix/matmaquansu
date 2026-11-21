@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js';
+import { Container, Graphics, ColorMatrixFilter } from 'pixi.js';
 import { AudioEngine } from '../core/AudioEngine';
 import { ActiveAmbushContext, FactionId, GameState } from '../core/GameState';
 import { InputManager } from '../core/InputManager';
@@ -22,6 +22,7 @@ interface Spark {
   vx: number;
   vy: number;
   life: number;
+  maxLife: number;
 }
 
 /**
@@ -87,6 +88,7 @@ export class CombatScene implements GameScene {
   private sparks: Spark[] = [];
 
   private hitTimer = 0;
+  private hitFlash = new ColorMatrixFilter();
   private hitSoundCooldown = 0;
   private hudHeader!: HTMLDivElement;
   private hudObserver?: ResizeObserver;
@@ -152,6 +154,9 @@ export class CombatScene implements GameScene {
 
     this.playerSprite = createVehicleSprite(vehicle, true);
     this.enemySprite = createEnemySprite(this.ambush.faction, this.ambush.bossRole);
+    this.hitFlash.brightness(2.8, false);
+    this.hitFlash.enabled = false;
+    this.enemySprite.filters = [this.hitFlash];
     this.actorContainer.addChild(this.enemySprite);
     this.actorContainer.addChild(this.playerSprite);
 
@@ -346,7 +351,7 @@ export class CombatScene implements GameScene {
     this.updateSparks(dt);
     this.hitTimer = Math.max(0, this.hitTimer - dt);
     this.hitSoundCooldown = Math.max(0, this.hitSoundCooldown - dt);
-    this.enemySprite.tint = this.hitTimer > 0.24 ? 0xffd17a : 0xffffff;
+    this.hitFlash.enabled = this.hitTimer > 0.045;
 
     if (this.shakeTimer > 0) {
       this.shakeTimer = Math.max(0, this.shakeTimer - dt);
@@ -400,12 +405,13 @@ export class CombatScene implements GameScene {
     }
 
     const prevEnemyX = this.enemyX;
-    const swayAmp = Math.min(175, this.arenaWidth * 0.34);
-    const swaySpeed = this.ambush.faction === 'my' || this.ambush.bossRole !== 'standard' ? 0.85 : 0.7;
+    const swayAmp = Math.max(0, Math.min(this.arenaWidth * 0.34, this.arenaWidth / 2 - 80));
+    const baseSwaySpeed = this.ambush.faction === 'my' || this.ambush.bossRole !== 'standard' ? 0.85 : 0.7;
+    const swaySpeed = Math.min(baseSwaySpeed, 150 / Math.max(1, swayAmp));
     this.enemyX = this.arenaLeft + this.arenaWidth / 2 + Math.sin(this.elapsed * swaySpeed) * swayAmp;
     this.enemyY = this.arenaTop + Math.min(82, this.arenaHeight * 0.18) + Math.sin(this.elapsed * 1.4) * 10;
     const enemyVx = dt > 0 ? (this.enemyX - prevEnemyX) / dt : 0;
-    this.enemySprite.position.set(this.enemyX, this.enemyY);
+    this.enemySprite.position.set(this.enemyX, this.enemyY - 3 * (this.hitTimer / 0.09));
 
     // Player fires rapid straight auto-aim stream ONLY AFTER the 4.5s weapon preparation bar fills
     if (this.state.autoFire && this.elapsed >= PLAYER_FIRE_WARMUP_SEC) {
@@ -492,8 +498,7 @@ export class CombatScene implements GameScene {
 
         // Lore strike: immediately cut 25% of boss's CURRENT HP + brief firing pause to read Visual Novel dialog
         const chunkDamage = Math.ceil(this.enemyHp * 0.25);
-        this.spawnSparks(this.enemyX, this.enemyY, 26, 0xe6a61e);
-        this.shakeTimer = Math.max(this.shakeTimer, 0.2);
+        this.spawnImpact(this.enemyX, this.enemyY, -Math.PI / 2);
         this.enemyFireTimer = Math.max(this.enemyFireTimer, 1.4);
         this.onEnemyDamaged(chunkDamage);
       }
@@ -510,7 +515,7 @@ export class CombatScene implements GameScene {
       { x: this.playerX, y: this.playerY, halfW: hitHalfW, halfH: hitHalfH },
       { x: this.enemyX, y: this.enemyY, radius: 36 },
       () => this.onPlayerDamaged(),
-      (damage) => this.onEnemyDamaged(damage),
+      (damage, x, y, angle) => this.onEnemyDamaged(damage, x, y, angle),
       () => {
         this.audio.playBombExplosion();
         this.shakeTimer = Math.max(this.shakeTimer, 0.24);
@@ -554,12 +559,12 @@ export class CombatScene implements GameScene {
     }
   }
 
-  private onEnemyDamaged(damage: number): void {
+  private onEnemyDamaged(damage: number, x = this.enemyX, y = this.enemyY + 24, angle = -Math.PI / 2): void {
     if (this.statePhase !== 'FIGHT') return;
     this.enemyHp = Math.max(0, this.enemyHp - damage);
-    this.hitTimer = 0.32;
-    this.enemySprite.tint = 0xffd17a;
-    this.spawnSparks(this.enemyX, this.enemyY + 16, 4, 0xffc857);
+    this.hitTimer = 0.09;
+    this.hitFlash.enabled = true;
+    this.spawnImpact(x, y, angle);
     if (this.hitSoundCooldown <= 0) {
       this.audio.playEnemyHit();
       this.hitSoundCooldown = 0.09;
@@ -592,7 +597,7 @@ export class CombatScene implements GameScene {
       this.statePhase = 'MODAL';
       this.shakeTimer = 0.6;
       this.audio.playDopamineFanfare();
-      this.spawnSparks(this.enemyX, this.enemyY, 72, 0xd4961a);
+      this.spawnSparks(this.enemyX, this.enemyY, 72, 0xff753a);
 
       this.loreToast.enqueueCustom(
         'CHẶNG I',
@@ -623,7 +628,7 @@ export class CombatScene implements GameScene {
       this.statePhase = 'MODAL';
       this.shakeTimer = 0.65;
       this.audio.playDopamineFanfare();
-      this.spawnSparks(this.enemyX, this.enemyY, 80, 0xd4961a);
+      this.spawnSparks(this.enemyX, this.enemyY, 80, 0xff753a);
 
       this.loreToast.enqueueCustom(
         'TRƯỜNG SƠN',
@@ -644,10 +649,11 @@ export class CombatScene implements GameScene {
       return;
     }
 
+    this.shakeTimer = Math.max(this.shakeTimer, 0.22);
     this.statePhase = 'VICTORY_HOLD';
     this.victoryHoldTimer = 0;
     this.audio.playEnemyDefeat();
-    this.spawnSparks(this.enemyX, this.enemyY, 36, 0xd98a18);
+    this.spawnSparks(this.enemyX, this.enemyY, 36, 0xff753a);
   }
 
   private handleDefeat(): void {
@@ -726,6 +732,26 @@ export class CombatScene implements GameScene {
     });
   }
 
+  private spawnImpact(x: number, y: number, angle: number): void {
+    const flash = new Graphics();
+    flash.star(0, 0, 4, 10, 2).fill({ color: 0xffffff }).stroke({ color: 0xc45c2b, width: 1 });
+    flash.position.set(x, y);
+    flash.rotation = angle;
+    this.fxContainer.addChild(flash);
+    this.sparks.push({ g: flash, vx: 0, vy: 0, life: 0.055, maxLife: 0.055 });
+    for (let i = 0; i < 5; i++) {
+      const direction = angle + Math.PI + (Math.random() - 0.5) * 2.4;
+      const speed = 100 + Math.random() * 130;
+      const life = 0.12 + Math.random() * 0.1;
+      const g = new Graphics();
+      g.poly([-4, -1, 5, 0, -4, 1]).fill({ color: i % 2 === 0 ? 0xffffff : 0xff7438 });
+      g.position.set(x, y);
+      g.rotation = direction;
+      this.fxContainer.addChild(g);
+      this.sparks.push({ g, vx: Math.cos(direction) * speed, vy: Math.sin(direction) * speed, life, maxLife: life });
+    }
+  }
+
   private spawnSparks(x: number, y: number, count: number, color: number): void {
     for (let i = 0; i < count; i++) {
       const g = new Graphics();
@@ -734,7 +760,8 @@ export class CombatScene implements GameScene {
       this.fxContainer.addChild(g);
       const ang = (i / count) * Math.PI * 2 + Math.random() * 0.4;
       const spd = 80 + Math.random() * 230;
-      this.sparks.push({ g, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life: 0.7 + Math.random() * 0.4 });
+      const life = 0.7 + Math.random() * 0.4;
+      this.sparks.push({ g, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, life, maxLife: life });
     }
   }
 
@@ -749,7 +776,7 @@ export class CombatScene implements GameScene {
       }
       s.g.x += s.vx * dt;
       s.g.y += s.vy * dt;
-      s.g.alpha = Math.min(1, s.life * 1.4);
+      s.g.alpha = Math.min(1, s.life / s.maxLife);
     }
   }
 

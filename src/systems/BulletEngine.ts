@@ -230,6 +230,23 @@ export class BulletEngine {
       onBombWarn
     } = params;
 
+    // Preserve the original mobile patterns; add coverage rather than giant bullets on wide screens.
+    const widthScale = Math.max(1, Math.min(3, arenaWidth / 700));
+    const radiusScale = Math.min(1.25, Math.sqrt(widthScale));
+    const travelScale = Math.min(1.2, Math.sqrt(widthScale));
+    const columnCount = (base: number): number => Math.round(base * widthScale);
+    const radialCount = (base: number): number => Math.round(base * Math.sqrt(widthScale));
+    const spawnArenaBullet = (bullet: Parameters<BulletEngine['spawnBullet']>[0]): void => {
+      this.spawnBullet({
+        ...bullet,
+        radius: bullet.radius * radiusScale,
+        vx: bullet.vx * travelScale,
+        vy: bullet.vy * travelScale,
+        resumeVx: bullet.resumeVx === undefined ? undefined : bullet.resumeVx * travelScale,
+        resumeVy: bullet.resumeVy === undefined ? undefined : bullet.resumeVy * travelScale
+      });
+    };
+
     const clampBombX = (x: number, r: number): number =>
       Math.max(arenaLeft + r * 0.65, Math.min(arenaLeft + arenaWidth - r * 0.65, x));
     const clampBombY = (y: number, r: number): number =>
@@ -237,12 +254,12 @@ export class BulletEngine {
 
     if (bossRole === 'tutorial' || bossRole === 'rematch') {
       // Signature ultra-hard boss pattern shared between Opening Tutorial & Tuyến Lửa Trường Sơn Rematch!
-      const ringCount = enraged ? 28 : 22;
+      const ringCount = radialCount(enraged ? 28 : 22);
       const offset = waveIndex * 0.23;
       const ringSpeed = (enraged ? 90 : 78) * speedScale;
       for (let i = 0; i < ringCount; i++) {
         const ang = offset + (i / ringCount) * Math.PI * 2;
-        this.spawnBullet({
+        spawnArenaBullet({
           fromPlayer: false,
           x: ex,
           y: ey,
@@ -255,11 +272,11 @@ export class BulletEngine {
       }
 
       if (waveIndex % 2 === 0) {
-        const hoverCount = enraged ? 13 : 10;
+        const hoverCount = radialCount(enraged ? 13 : 10);
         for (let i = 0; i < hoverCount; i++) {
           const ang = Math.PI * 0.1 + (i / (hoverCount - 1)) * Math.PI * 0.8;
           const travelSpeed = (102 + (i % 3) * 32) * speedScale;
-          this.spawnBullet({
+          spawnArenaBullet({
             fromPlayer: false,
             behavior: 'hover_then_drift',
             x: ex,
@@ -292,13 +309,13 @@ export class BulletEngine {
 
     switch (faction) {
       case 'phap': {
-        const cols = enraged ? 11 : 9;
+        const cols = columnCount(enraged ? 11 : 9);
         const safeCol = (waveIndex * 2 + 3) % cols;
         const gapStep = arenaWidth / (cols + 1);
         for (let i = 0; i < cols; i++) {
           if (i === safeCol || i === (safeCol + 1) % cols) continue;
           const bx = arenaLeft + gapStep * (i + 1);
-          this.spawnBullet({
+          spawnArenaBullet({
             fromPlayer: false,
             x: bx,
             y: ey + 8,
@@ -310,9 +327,10 @@ export class BulletEngine {
           });
         }
         if (waveIndex % 2 === 1) {
-          for (let i = 0; i < 6; i++) {
-            const ang = Math.PI * 0.16 + (i / 5) * Math.PI * 0.68;
-            this.spawnBullet({
+          const fanCount = radialCount(6);
+          for (let i = 0; i < fanCount; i++) {
+            const ang = Math.PI * 0.16 + (i / (fanCount - 1)) * Math.PI * 0.68;
+            spawnArenaBullet({
               fromPlayer: false,
               behavior: 'hover_then_drift',
               x: ex,
@@ -339,13 +357,13 @@ export class BulletEngine {
 
       case 'phap_plus': {
         // B-26 Bomber: Dual-layer slow curtains + hovering mines + heavy circular AoE bombs
-        const count = enraged ? 22 : 18;
+        const count = radialCount(enraged ? 22 : 18);
         const spin = waveIndex * 0.28;
         for (let i = 0; i < count; i++) {
           const ang = spin + (i / count) * Math.PI * 2;
           const slowLayer = i % 2 === 0;
           const v = (slowLayer ? 66 : 94) * speedScale;
-          this.spawnBullet({
+          spawnArenaBullet({
             fromPlayer: false,
             x: ex,
             y: ey,
@@ -357,9 +375,10 @@ export class BulletEngine {
           });
         }
         if (waveIndex % 2 === 0) {
-          for (let i = 0; i < 8; i++) {
-            const ang = Math.PI * 0.14 + (i / 7) * Math.PI * 0.72;
-            this.spawnBullet({
+          const fanCount = radialCount(8);
+          for (let i = 0; i < fanCount; i++) {
+            const ang = Math.PI * 0.14 + (i / (fanCount - 1)) * Math.PI * 0.72;
+            spawnArenaBullet({
               fromPlayer: false,
               behavior: 'hover_then_drift',
               x: ex,
@@ -368,7 +387,7 @@ export class BulletEngine {
               vy: Math.sin(ang) * 108 * speedScale,
               hoverStart: 1.2 + (i % 2) * 0.45,
               hoverDuration: 2.5,
-              resumeVx: (i - 3.5) * 10,
+              resumeVx: (i / (fanCount - 1) - 0.5) * 70,
               resumeVy: 60 * speedScale,
               radius: 6,
               damage: 1,
@@ -393,12 +412,12 @@ export class BulletEngine {
       }
 
       case 'nguy': {
-        const count = enraged ? 24 : 20;
+        const count = radialCount(enraged ? 24 : 20);
         const spin = waveIndex * 0.34;
         for (let i = 0; i < count; i++) {
           const ang = spin + (i / count) * Math.PI * 2;
           const v = 86 * speedScale;
-          this.spawnBullet({
+          spawnArenaBullet({
             fromPlayer: false,
             x: ex,
             y: ey,
@@ -410,12 +429,12 @@ export class BulletEngine {
           });
         }
         if (waveIndex % 2 === 0) {
-          const cols = 12;
+          const cols = columnCount(12);
           const gap1 = (waveIndex * 3 + 2) % cols;
           const step = arenaWidth / (cols + 1);
           for (let i = 0; i < cols; i++) {
             if (i === gap1 || i === (gap1 + 1) % cols) continue;
-            this.spawnBullet({
+            spawnArenaBullet({
               fromPlayer: false,
               behavior: 'hover_then_drift',
               x: arenaLeft + step * (i + 1),
@@ -442,12 +461,12 @@ export class BulletEngine {
 
       case 'my': {
         // US F-4 Fighter-Bomber (Peak difficulty): Dense slow bullet labyrinth + hovering mines + MULTIPLE HUGE AoE BOMB CIRCLES!
-        const count = enraged ? 28 : 24;
+        const count = radialCount(enraged ? 28 : 24);
         const spin = waveIndex * 0.25;
         for (let i = 0; i < count; i++) {
           const ang = spin + (i / count) * Math.PI * 2;
           const v = (i % 3 === 0 ? 100 : 74) * speedScale;
-          this.spawnBullet({
+          spawnArenaBullet({
             fromPlayer: false,
             x: ex,
             y: ey,
@@ -458,12 +477,12 @@ export class BulletEngine {
             color: i % 3 === 0 ? 0xb5173e : i % 3 === 1 ? 0xd15c0e : 0x5c2b99
           });
         }
-        const hoverCols = 11;
+        const hoverCols = columnCount(11);
         const safeSlot = (waveIndex * 4 + 1) % hoverCols;
         const step = arenaWidth / (hoverCols + 1);
         for (let i = 0; i < hoverCols; i++) {
           if (i === safeSlot || i === (safeSlot + 1) % hoverCols) continue;
-          this.spawnBullet({
+          spawnArenaBullet({
             fromPlayer: false,
             behavior: 'hover_then_drift',
             x: arenaLeft + step * (i + 1),
@@ -493,12 +512,12 @@ export class BulletEngine {
 
       case 'nguy_minus': {
         // Weakened 1975 Saigon remnant: sparse slow rings, wide safe gaps
-        const count = enraged ? 11 : 8;
+        const count = radialCount(enraged ? 11 : 8);
         const spin = waveIndex * 0.3;
         for (let i = 0; i < count; i++) {
           const ang = spin + (i / count) * Math.PI * 2;
           const v = 66 * speedScale;
-          this.spawnBullet({
+          spawnArenaBullet({
             fromPlayer: false,
             x: ex,
             y: ey,
@@ -520,7 +539,7 @@ export class BulletEngine {
     playerBox: { x: number; y: number; halfW: number; halfH: number },
     enemyCircle: { x: number; y: number; radius: number } | null,
     onPlayerHit: () => void,
-    onEnemyHit: (damage: number) => void,
+    onEnemyHit: (damage: number, x: number, y: number, angle: number) => void,
     onBombDetonate?: () => void
   ): void {
     // 1. Update & render Circular AoE Bomb Strike Zones
@@ -637,7 +656,7 @@ export class BulletEngine {
           const dy = b.y - enemyCircle.y;
           const hitR = enemyCircle.radius + b.radius;
           if (dx * dx + dy * dy <= hitR * hitR) {
-            onEnemyHit(b.damage);
+            onEnemyHit(b.damage, b.x, b.y, Math.atan2(moveVy, moveVx));
             this.deactivate(b);
           }
         }
