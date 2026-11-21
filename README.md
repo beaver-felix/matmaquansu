@@ -13,6 +13,10 @@ Xây dựng bằng `Vite` + `TypeScript` + `PixiJS` (WebGL) và Web Audio thuầ
 | **Máy tính** | `WASD` hoặc phím mũi tên để di chuyển · `Space` bật/tắt tự ngắm bắn |
 | **Điện thoại** | Chạm & kéo trực tiếp trên màn hình (ngón tay không che xe & đạn) |
 
+Nút **DEV · CÀI ĐẶT** mở bảng nhà phát triển và tạm dừng trò chơi. Bật **Bất tử** để không nhận sát thương, hoặc chuyển thẳng đến một trong 5 chặng. Chuyển chặng bắt đầu lượt mới với xe/kỹ năng tương ứng, xóa tiến trình cũ và giữ lựa chọn bất tử. Bắt đầu lượt chơi bình thường tắt bất tử.
+
+Trúng địch có chớp trắng, tia lửa cam/trắng ngắn, giật nhẹ thân xe và tiếng va kim loại; không hiện số sát thương. Sân giao tranh trải rộng theo màn hình, bên dưới thanh điều khiển. Địch di chuyển rộng hơn; màn đạn tăng mật độ theo chiều rộng, kích thước đạn tăng tối đa 25% và tốc độ tối đa 20%.
+
 ### Cơ chế cốt lõi
 1. **Bản đồ mở theo đường mòn (5 chặng, 1945–1975)**: Xe chạy bám theo mạng lưới đường mòn phân nhánh tới trạm đích. Các ổ phục kích ẩn kín trên đường; mỗi chặng chỉ có **đúng 1 nhánh sạch** để lách qua nếu đọc tốt tín hiệu Cơ yếu.
 2. **Cải tiến Cơ yếu theo cột mốc lịch sử**: Rời mỗi chặng được đọc hồ sơ chiến trường, tự động nâng cấp phương tiện (`Xe đạp` → `Xe đạp thồ` → `Xe bốn bánh` → `Xe tải Trường Sơn` → `Xe tăng T-54B`) và chọn 1 trong 3 cải tiến Cơ yếu (radar quét vùng bẫy, tín hiệu viền màn hình + nhịp Morse, gợi ý mật mã địa hình, giải mã nhánh an toàn).

@@ -116,6 +116,16 @@ export class LoreToastUI {
     this.host.appendChild(box);
     this.bodyEl = box.querySelector('.vn-body');
     this.timerFillEl = box.querySelector('.vn-timer-fill');
+    if (this.bodyEl) {
+      // Reserve the full message before typewriting so the combat arena stays stable.
+      this.bodyEl.textContent = this.fullText;
+      this.bodyEl.style.minHeight = `${this.bodyEl.offsetHeight}px`;
+      this.bodyEl.textContent = '';
+    }
+  }
+
+  getReservedBottom(): number {
+    return this.active ? this.host.offsetHeight + 18 : 16;
   }
 
   update(dt: number): void {

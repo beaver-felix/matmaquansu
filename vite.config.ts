@@ -7,6 +7,7 @@ export default defineConfig({
     port: 5173
   },
   build: {
+    rollupOptions: { input: { game: 'index.html', artwork: 'artwork.html' } },
     target: 'es2022',
     sourcemap: false
   }
