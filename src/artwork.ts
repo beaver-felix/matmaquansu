@@ -1,7 +1,7 @@
 import { Application, Container } from 'pixi.js';
 import { createAircraftAlternative, createBicycleAlternative, createOutpostAlternative, createJeepAlternative, createTruckAlternative, createPalaceAlternative } from './render/ArtworkAlternatives';
 import { VEHICLES } from './data/vehicles';
-import { createEnemySprite, createIndependencePalaceGate, createLorePickupSprite, createVehicleSprite } from './render/SpriteFactory';
+import { createEnemySprite, createIndependencePalaceGate, createLorePickupSprite, createVehicleSprite } from './render/OriginalArtwork';
 
 async function showArtwork(): Promise<void> {
   const host = document.getElementById('gallery');
@@ -71,8 +71,8 @@ async function showArtwork(): Promise<void> {
         pair.className = piece.alternative ? 'pair' : '';
         if (piece.alternative) article.classList.add('has-alternative');
         if (piece.wide) article.classList.add('wide-art');
-        const versions = [{ label: 'Current — in game', make: piece.make }];
-        if (piece.alternative) versions.push({ label: 'Proposed — preview only', make: piece.alternative });
+        const versions = [{ label: 'Before', make: piece.make }];
+        if (piece.alternative) versions.push({ label: 'After — in game', make: piece.alternative });
         for (const version of versions) {
           const panel = document.createElement('div');
           const label = document.createElement('h4');

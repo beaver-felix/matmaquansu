@@ -1,6 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
 
-// Gallery-only concepts. Gameplay continues to use SpriteFactory until a design is approved.
+import type { GateParts } from './OriginalArtwork';
 function vietnamFlag(g: Graphics, x: number, y: number, width: number): void {
   const height = width * 2 / 3;
   g.rect(x - width / 2, y - height / 2, width, height).fill({ color: 0xc92b27 });
@@ -264,6 +264,12 @@ export function createTruckAlternative(): Container {
 }
 
 export function createPalaceAlternative(): Container {
+  const parts = createPalaceArtwork();
+  parts.flag.visible = true;
+  return parts.container;
+}
+
+export function createPalaceArtwork(): GateParts {
   const root = new Container();
   const grounds = new Graphics();
   grounds.rect(-360, -240, 720, 250).fill({ color: 0x839969 });
@@ -312,13 +318,18 @@ export function createPalaceAlternative(): Container {
     fence.rect(x, -13, 260, 21).fill({ color: 0xaaa993 });
     fence.rect(x, -15, 260, 5).fill({ color: 0xe8dfc7 });
   }
-  fence.rect(-83, -9, 166, 18).fill({ color: 0x243e39 });
-  for (let x = -78; x < 83; x += 8) {
-    fence.moveTo(x, -12).lineTo(x, 8).stroke({ color: 0x9dada0, width: 1.7 });
-    fence.poly([x - 2, -11, x, -15, x + 2, -11]).fill({ color: 0xd2c79d });
+  const leftLeaf = new Graphics();
+  const rightLeaf = new Graphics();
+  leftLeaf.position.set(-82, 0);
+  rightLeaf.position.set(82, 0);
+  for (const [leaf, start] of [[leftLeaf, 0], [rightLeaf, -82]] as const) {
+    leaf.rect(start, -9, 82, 18).fill({ color: 0x243e39 });
+    for (let x = start + 4; x < start + 82; x += 8) {
+      leaf.moveTo(x, -12).lineTo(x, 8).stroke({ color: 0x9dada0, width: 1.7 });
+      leaf.poly([x - 2, -11, x, -15, x + 2, -11]).fill({ color: 0xd2c79d });
+    }
+    leaf.moveTo(start, -4).lineTo(start + 82, -4).stroke({ color: 0xc0c4aa, width: 1.5 });
   }
-  fence.moveTo(-82, -4).lineTo(82, -4).stroke({ color: 0xc0c4aa, width: 1.5 });
-  fence.moveTo(0, -12).lineTo(0, 9).stroke({ color: 0xc0c4aa, width: 2 });
   for (const x of [-108, 82]) {
     fence.roundRect(x + 4, -18, 26, 32, 2).fill({ color: 0x52644f, alpha: 0.3 });
     fence.rect(x, -24, 26, 34).fill({ color: 0xc5bea5 });
@@ -326,13 +337,16 @@ export function createPalaceAlternative(): Container {
     fence.rect(x - 3, -28, 32, 6).fill({ color: 0xf0e7cf });
     fence.circle(x + 13, -31, 4).fill({ color: 0xddcfaa });
   }
-  const flag = new Graphics();
+  const flag = new Container();
+  const flagArt = new Graphics();
+  flag.addChild(flagArt);
+  flag.visible = false;
   // Keep the existing finale flag's red/blue fields and yellow star unchanged.
-  flag.rect(-2, -226, 4, 100).fill({ color: 0x6a7c70 });
-  flag.rect(-2, -226, 1, 100).fill({ color: 0xcbd0b8 });
-  flag.rect(2, -225, 54, 18).fill({ color: 0xd92323 });
-  flag.rect(2, -207, 54, 18).fill({ color: 0x1e66c9 });
-  flag.star(29, -207, 5, 10, 4.2).fill({ color: 0xffe44d });
-  root.addChild(grounds, building, fence, flag);
-  return root;
+  flagArt.rect(-2, -226, 4, 100).fill({ color: 0x6a7c70 });
+  flagArt.rect(-2, -226, 1, 100).fill({ color: 0xcbd0b8 });
+  flagArt.rect(2, -225, 54, 18).fill({ color: 0xd92323 });
+  flagArt.rect(2, -207, 54, 18).fill({ color: 0x1e66c9 });
+  flagArt.star(29, -207, 5, 10, 4.2).fill({ color: 0xffe44d });
+  root.addChild(grounds, building, fence, leftLeaf, rightLeaf, flag);
+  return { container: root, leftLeaf, rightLeaf, flag };
 }
