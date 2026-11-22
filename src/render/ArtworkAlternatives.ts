@@ -1,6 +1,6 @@
 import { Container, Graphics } from 'pixi.js';
 
-// Gallery-only concepts. Gameplay continues to use SpriteFactory until a design is approved.
+import type { GateParts } from './OriginalArtwork';
 function vietnamFlag(g: Graphics, x: number, y: number, width: number): void {
   const height = width * 2 / 3;
   g.rect(x - width / 2, y - height / 2, width, height).fill({ color: 0xc92b27 });
@@ -186,4 +186,167 @@ export function createAircraftAlternative(kind: 'b26' | 'f4' | 'b52'): Container
   }
   root.addChild(shadow, airframe, engines, body, markings);
   return root;
+}
+
+export function createJeepAlternative(): Container {
+  const root = new Container();
+  const shadow = new Graphics();
+  shadow.roundRect(-11, -17, 27, 40, 6).fill({ color: 0x25382c, alpha: 0.2 });
+  const chassis = new Graphics();
+  for (const x of [-15, 10]) {
+    for (const y of [-16, 8]) {
+      chassis.roundRect(x, y, 5, 10, 1.5).fill({ color: 0x1c2b25 });
+      chassis.moveTo(x + 1, y + 2).lineTo(x + 1, y + 8).stroke({ color: 0x7c8871, width: 0.7 });
+    }
+  }
+  chassis.roundRect(-12, -20, 24, 41, 4).fill({ color: 0x294733 });
+  const body = new Graphics();
+  body.poly([-9, -21, 9, -21, 12, -15, 12, 17, 9, 20, -9, 20, -12, 17, -12, -15])
+    .fill({ color: 0x5f8051 });
+  body.roundRect(-9, -19, 18, 13, 2).fill({ color: 0x87a16a });
+  body.moveTo(-8, -18).lineTo(-8, -7).stroke({ color: 0xc3cfa0, width: 0.8 });
+  body.rect(8, -17, 2, 10).fill({ color: 0x4f7047 });
+  vietnamFlag(body, 0, -12, 10);
+  body.roundRect(-9, -1, 18, 16, 2).fill({ color: 0x263d2e });
+  for (const x of [-7, 1]) {
+    body.roundRect(x, 1, 6, 9, 1.5).fill({ color: 0x9b966a });
+    body.roundRect(x, 7, 6, 4, 1).fill({ color: 0x6a724f });
+  }
+  body.circle(-4, 0, 2).stroke({ color: 0xc1c4a0, width: 0.8 });
+  body.roundRect(-10, -6, 20, 5, 1).fill({ color: 0x23483f });
+  body.poly([-9, -5, -1, -5, -1, -2, -9, -2]).fill({ color: 0x9ac9bd });
+  body.poly([1, -5, 9, -5, 9, -2, 1, -2]).fill({ color: 0x6ca49a });
+  body.moveTo(-10, -6).lineTo(10, -6).stroke({ color: 0xc6ce9e, width: 0.9 });
+  body.roundRect(-5, 14, 10, 7, 2.5).fill({ color: 0x20372b });
+  body.ellipse(0, 17, 2.5, 2).fill({ color: 0x6c8556 });
+  body.rect(-11, -22, 22, 2).fill({ color: 0x5f7154 });
+  for (const x of [-9, 6]) body.roundRect(x, -21, 3, 2, 0.5).fill({ color: 0xf3dda1 });
+  root.addChild(shadow, chassis, body);
+  return root;
+}
+
+export function createTruckAlternative(): Container {
+  const root = new Container();
+  const shadow = new Graphics();
+  shadow.roundRect(-13, -23, 32, 53, 6).fill({ color: 0x25382c, alpha: 0.2 });
+  const chassis = new Graphics();
+  chassis.roundRect(-13, -25, 26, 52, 3).fill({ color: 0x293e2d });
+  for (const x of [-18, 13]) {
+    for (const y of [-19, 8, 19]) {
+      chassis.roundRect(x, y, 5, 8, 1.5).fill({ color: 0x192b23 });
+      chassis.moveTo(x + 1, y + 1).lineTo(x + 1, y + 7).stroke({ color: 0x78866b, width: 0.8 });
+    }
+  }
+  const cab = new Graphics();
+  cab.roundRect(-14, -27, 28, 18, 4).fill({ color: 0x4c7248 });
+  cab.poly([-10, -27, 10, -27, 13, -22, -13, -22]).fill({ color: 0x93a974 });
+  cab.moveTo(-12, -21).lineTo(-12, -12).stroke({ color: 0xb1c38d, width: 1 });
+  cab.roundRect(-11, -22, 22, 6, 1.5).fill({ color: 0x294e45 });
+  cab.poly([-10, -21, -1, -21, -1, -17, -9, -17]).fill({ color: 0x9acabd });
+  cab.poly([1, -21, 10, -21, 9, -17, 1, -17]).fill({ color: 0x709f91 });
+  vietnamFlag(cab, 0, -12, 10);
+  cab.rect(-13, -28, 26, 2).fill({ color: 0x566c4c });
+  for (const x of [-11, 7]) cab.roundRect(x, -27, 4, 2, 0.5).fill({ color: 0xf3dda1 });
+  const cargo = new Graphics();
+  cargo.roundRect(-14, -6, 28, 34, 2).fill({ color: 0x3b5238 });
+  cargo.moveTo(-14, 24).lineTo(-14, -2).quadraticCurveTo(-13, -8, -8, -8)
+    .lineTo(8, -8).quadraticCurveTo(13, -8, 14, -2).lineTo(14, 24).closePath().fill({ color: 0x7d8960 });
+  cargo.moveTo(-8, -7).lineTo(-8, 24).lineTo(7, 24).lineTo(7, -7).closePath().fill({ color: 0x9b9e72 });
+  cargo.poly([7, -7, 12, -4, 14, 24, 7, 24]).fill({ color: 0x606f4b });
+  for (const y of [-1, 8, 17]) {
+    cargo.moveTo(-13, y + 2).quadraticCurveTo(0, y - 3, 13, y + 2).stroke({ color: 0x566a49, width: 1 });
+    cargo.moveTo(-7, y).quadraticCurveTo(0, y - 2, 6, y).stroke({ color: 0xc3c297, width: 0.8 });
+  }
+  cargo.rect(-13, 24, 26, 3).fill({ color: 0x4a6541 });
+  for (const x of [-10, 9]) cargo.rect(x, 24, 2, 3).fill({ color: 0xbbbd86 });
+  root.addChild(shadow, chassis, cab, cargo);
+  return root;
+}
+
+export function createPalaceAlternative(): Container {
+  const parts = createPalaceArtwork();
+  parts.flag.visible = true;
+  return parts.container;
+}
+
+export function createPalaceArtwork(): GateParts {
+  const root = new Container();
+  const grounds = new Graphics();
+  grounds.rect(-360, -240, 720, 250).fill({ color: 0x839969 });
+  grounds.rect(-340, -220, 680, 212).fill({ color: 0x9aae78 });
+  grounds.poly([-94, -80, 94, -80, 130, 2, -130, 2]).fill({ color: 0xd6cbb4 });
+  grounds.ellipse(0, -42, 47, 18).fill({ color: 0x6e8860 });
+  grounds.ellipse(0, -46, 44, 16).fill({ color: 0xdfdcc6 });
+  grounds.ellipse(0, -47, 37, 11).fill({ color: 0x72aaa4 });
+  grounds.ellipse(-6, -49, 26, 5).fill({ color: 0xadd1bd });
+  for (const x of [-300, -260, 260, 300]) {
+    for (const y of [-170, -110, -50]) {
+      grounds.ellipse(x + 5, y + 5, 13, 10).fill({ color: 0x536d47, alpha: 0.35 });
+      grounds.circle(x, y, 12).fill({ color: 0x4c7451 });
+      grounds.circle(x - 3, y - 3, 8).fill({ color: 0x779761 });
+    }
+  }
+  const building = new Graphics();
+  building.rect(-225, -207, 464, 121).fill({ color: 0x5f6a55, alpha: 0.3 });
+  building.rect(-230, -218, 460, 120).fill({ color: 0xbab8a1 });
+  building.rect(-222, -211, 444, 105).fill({ color: 0xe2ddc5 });
+  building.rect(-215, -200, 430, 77).fill({ color: 0x42605b });
+  for (let x = -208; x < 210; x += 24) {
+    building.rect(x, -196, 15, 29).fill({ color: 0x8aa69a });
+    building.rect(x, -160, 15, 30).fill({ color: 0x708f83 });
+    building.rect(x, -196, 2, 66).fill({ color: 0xd4d4b8 });
+  }
+  for (let x = -216; x <= 210; x += 16) {
+    building.poly([x, -202, x + 4, -205, x + 7, -203, x + 7, -123, x + 4, -120, x, -122])
+      .fill({ color: 0xece6ce });
+    building.rect(x + 4, -201, 3, 77).fill({ color: 0xb5b79e });
+  }
+  building.rect(-230, -218, 460, 9).fill({ color: 0xf3ecd5 });
+  building.rect(-230, -209, 460, 3).fill({ color: 0x9b9f89 });
+  building.rect(-230, -169, 460, 5).fill({ color: 0xe8e1c8 });
+  building.rect(-230, -124, 460, 8).fill({ color: 0xf0e6ce });
+  building.roundRect(-100, -232, 200, 14, 2).fill({ color: 0xc8c6ae });
+  building.rect(-105, -234, 210, 4).fill({ color: 0xf0e8d1 });
+  building.rect(-44, -124, 88, 25).fill({ color: 0x34534c });
+  for (const x of [-41, -14, 13]) building.rect(x, -121, 25, 20).fill({ color: 0x749b89 });
+  building.rect(-65, -128, 130, 5).fill({ color: 0xd3cdb5 });
+  for (let step = 0; step < 4; step++) {
+    building.rect(-72 - step * 7, -99 + step * 4, 144 + step * 14, 4).fill({ color: step % 2 === 0 ? 0xe5dbc3 : 0xc0bba4 });
+  }
+  const fence = new Graphics();
+  for (const x of [-360, 100]) {
+    fence.rect(x, -13, 260, 21).fill({ color: 0xaaa993 });
+    fence.rect(x, -15, 260, 5).fill({ color: 0xe8dfc7 });
+  }
+  const leftLeaf = new Graphics();
+  const rightLeaf = new Graphics();
+  leftLeaf.position.set(-82, 0);
+  rightLeaf.position.set(82, 0);
+  for (const [leaf, start] of [[leftLeaf, 0], [rightLeaf, -82]] as const) {
+    leaf.rect(start, -9, 82, 18).fill({ color: 0x243e39 });
+    for (let x = start + 4; x < start + 82; x += 8) {
+      leaf.moveTo(x, -12).lineTo(x, 8).stroke({ color: 0x9dada0, width: 1.7 });
+      leaf.poly([x - 2, -11, x, -15, x + 2, -11]).fill({ color: 0xd2c79d });
+    }
+    leaf.moveTo(start, -4).lineTo(start + 82, -4).stroke({ color: 0xc0c4aa, width: 1.5 });
+  }
+  for (const x of [-108, 82]) {
+    fence.roundRect(x + 4, -18, 26, 32, 2).fill({ color: 0x52644f, alpha: 0.3 });
+    fence.rect(x, -24, 26, 34).fill({ color: 0xc5bea5 });
+    fence.rect(x, -24, 18, 34).fill({ color: 0xe3dcc4 });
+    fence.rect(x - 3, -28, 32, 6).fill({ color: 0xf0e7cf });
+    fence.circle(x + 13, -31, 4).fill({ color: 0xddcfaa });
+  }
+  const flag = new Container();
+  const flagArt = new Graphics();
+  flag.addChild(flagArt);
+  flag.visible = false;
+  // Keep the existing finale flag's red/blue fields and yellow star unchanged.
+  flagArt.rect(-2, -226, 4, 100).fill({ color: 0x6a7c70 });
+  flagArt.rect(-2, -226, 1, 100).fill({ color: 0xcbd0b8 });
+  flagArt.rect(2, -225, 54, 18).fill({ color: 0xd92323 });
+  flagArt.rect(2, -207, 54, 18).fill({ color: 0x1e66c9 });
+  flagArt.star(29, -207, 5, 10, 4.2).fill({ color: 0xffe44d });
+  root.addChild(grounds, building, fence, leftLeaf, rightLeaf, flag);
+  return { container: root, leftLeaf, rightLeaf, flag };
 }

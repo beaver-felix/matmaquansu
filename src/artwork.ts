@@ -1,7 +1,7 @@
 import { Application, Container } from 'pixi.js';
-import { createAircraftAlternative, createBicycleAlternative, createOutpostAlternative } from './render/ArtworkAlternatives';
+import { createAircraftAlternative, createBicycleAlternative, createOutpostAlternative, createJeepAlternative, createTruckAlternative, createPalaceAlternative } from './render/ArtworkAlternatives';
 import { VEHICLES } from './data/vehicles';
-import { createEnemySprite, createIndependencePalaceGate, createLorePickupSprite, createVehicleSprite } from './render/SpriteFactory';
+import { createEnemySprite, createIndependencePalaceGate, createLorePickupSprite, createVehicleSprite } from './render/OriginalArtwork';
 
 async function showArtwork(): Promise<void> {
   const host = document.getElementById('gallery');
@@ -11,7 +11,7 @@ async function showArtwork(): Promise<void> {
   app.stop();
   host.textContent = '';
 
-  const sections: { title: string; pieces: { name: string; note: string; make: () => Container; alternative?: () => Container; critique?: string }[] }[] = [
+  const sections: { title: string; pieces: { name: string; note: string; make: () => Container; alternative?: () => Container; critique?: string; wide?: boolean }[] }[] = [
     {
       title: 'Player vehicles — all five levels',
       pieces: VEHICLES.map((vehicle) => ({
@@ -19,9 +19,13 @@ async function showArtwork(): Promise<void> {
         note: `${vehicle.subtitle}${vehicle.id === 'tank' ? ' · Earlier artwork restored' : ''}`,
         make: () => createVehicleSprite(vehicle),
         alternative: vehicle.id === 'bicycle' || vehicle.id === 'pack_bike'
-          ? () => createBicycleAlternative(vehicle.id === 'pack_bike') : undefined,
+          ? () => createBicycleAlternative(vehicle.id === 'pack_bike')
+          : vehicle.id === 'jeep' ? createJeepAlternative
+          : vehicle.id === 'truck' ? createTruckAlternative : undefined,
         critique: vehicle.id === 'bicycle' || vehicle.id === 'pack_bike'
-          ? 'Weak silhouette: the current rider reads as a button, not a cyclist. Proposed: exposed wheels, handlebars, rider posture and a red flag with a yellow star.' : undefined
+          ? 'Weak silhouette: the current rider reads as a button, not a cyclist. Proposed: exposed wheels, handlebars, rider posture and a red flag with a yellow star.'
+          : vehicle.id === 'jeep' ? 'Proposed: an open cabin, seats, spare wheel and a defined hood. Vietnam’s red flag and yellow star stay visible.'
+          : vehicle.id === 'truck' ? 'Proposed: a shaped cab, split windshield and curved canvas cargo cover, with the Vietnamese flag retained.' : undefined
       }))
     },
     {
@@ -44,7 +48,7 @@ async function showArtwork(): Promise<void> {
           const gate = createIndependencePalaceGate();
           gate.flag.visible = true;
           return gate.container;
-        } }
+        }, alternative: createPalaceAlternative, wide: true, critique: 'Proposed: layered balconies, shaded glazing and colonnades, entry steps, reflecting pool, landscaped grounds and a detailed gate. The original finale flag is preserved.' }
       ]
     }
   ];
@@ -66,8 +70,9 @@ async function showArtwork(): Promise<void> {
         const pair = document.createElement('div');
         pair.className = piece.alternative ? 'pair' : '';
         if (piece.alternative) article.classList.add('has-alternative');
-        const versions = [{ label: 'Current — in game', make: piece.make }];
-        if (piece.alternative) versions.push({ label: 'Proposed — preview only', make: piece.alternative });
+        if (piece.wide) article.classList.add('wide-art');
+        const versions = [{ label: 'Before', make: piece.make }];
+        if (piece.alternative) versions.push({ label: 'After — in game', make: piece.alternative });
         for (const version of versions) {
           const panel = document.createElement('div');
           const label = document.createElement('h4');
